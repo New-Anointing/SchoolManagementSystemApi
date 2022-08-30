@@ -12,7 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApiDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
-builder.Services.AddScoped<IOrgRegServices, OrgRegServices>();
+builder.Services.AddScoped<IRegServices, RegServices>();
 
 
 var app = builder.Build();

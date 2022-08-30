@@ -1,6 +1,6 @@
 ﻿namespace SchoolManagementSystemApi.DTOModel
 {
-    public class OrganisationRegistrationDTO
+    public class SchoolRegistrationDTO
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
