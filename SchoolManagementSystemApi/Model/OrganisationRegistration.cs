@@ -22,6 +22,8 @@ namespace SchoolManagementSystemApi.Model
         public string? Address { get; set; }
         [Required]
         public string? PhoneNumber { get; set; }
+        [Required]
+        public string? Role { get; set; }
 
     }
 }

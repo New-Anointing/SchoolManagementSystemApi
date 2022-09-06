@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagementSystemApi.DTOModel;
-using SchoolManagementSystemApi.Services.OrgRegistration;
+using SchoolManagementSystemApi.Services.SchoolRegistration;
 
 namespace SchoolManagementSystemApi.Controllers
 {
@@ -19,7 +19,7 @@ namespace SchoolManagementSystemApi.Controllers
         public async Task<ActionResult> SchoolRegistration(SchoolRegistrationDTO request)
         {
             await _iorgRegServices.SchoolRegistration(request);
-            return Ok();
+            return Created("", Ok());
         }
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserLoginDto request)

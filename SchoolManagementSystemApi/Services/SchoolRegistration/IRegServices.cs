@@ -1,7 +1,7 @@
 ﻿using SchoolManagementSystemApi.DTOModel;
 using SchoolManagementSystemApi.Model;
 
-namespace SchoolManagementSystemApi.Services.OrgRegistration
+namespace SchoolManagementSystemApi.Services.SchoolRegistration
 {
     public interface IRegServices
     {

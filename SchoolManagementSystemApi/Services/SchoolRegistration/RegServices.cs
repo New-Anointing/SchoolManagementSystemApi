@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace SchoolManagementSystemApi.Services.OrgRegistration
+namespace SchoolManagementSystemApi.Services.SchoolRegistration
 {
     public class RegServices : IRegServices
     {
@@ -33,6 +33,7 @@ namespace SchoolManagementSystemApi.Services.OrgRegistration
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.PhoneNumber = request.PhoneNumber;
+            user.Role = "SuperAdmin";
 
              _context.OrganisationReg.Add(user);
             await _context.SaveChangesAsync();
@@ -79,7 +80,8 @@ namespace SchoolManagementSystemApi.Services.OrgRegistration
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Email)
+                new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.Role, user.Role)
             };
             var Key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 _configuration.GetSection("JwtTokens:Key").Value));
