@@ -16,17 +16,19 @@ namespace SchoolManagementSystemApi.Controllers
         }
         [HttpPost("SchoolRegistration")]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult> SchoolRegistration(SchoolRegistrationDTO request)
         {
-            await _iorgRegServices.SchoolRegistration(request);
-            return Created("", Ok());
+            try
+            {
+                await _iorgRegServices.SchoolRegistration(request);
+            }
+            catch(ArgumentException)
+            {
+                return Conflict();
+            }
+            return Created("", Ok("User Created Successfully"));
         }
-        [HttpPost("Login")]
-        public async Task<IActionResult> Login(UserLoginDto request)
-        {
-            return await _iorgRegServices.Login(request) == null ? NotFound("User not found or incorrect password") : Ok(new {Value = _iorgRegServices.Login(request)});
 
-
-        }
     }
 }

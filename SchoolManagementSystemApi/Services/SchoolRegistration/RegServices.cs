@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
 using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.DTOModel;
 using SchoolManagementSystemApi.Model;
+using SchoolManagementSystemApi.Utilities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -14,86 +13,106 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
     public class RegServices : IRegServices
     {
         private readonly ApiDbContext _context;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<OrganisationRegistration> _userManager;
         private IConfiguration _configuration;
         public static OrganisationRegistration user = new();
-        public RegServices(ApiDbContext context, IConfiguration configuration)
+        public RegServices
+        (
+            ApiDbContext context,
+            IConfiguration configuration,
+            UserManager<OrganisationRegistration> userManager,
+            RoleManager<IdentityRole> roleManager
+        )
         {
             _context = context;
             _configuration = configuration;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
+
+
+
+
+
         public async Task<OrganisationRegistration> SchoolRegistration(SchoolRegistrationDTO request)
         {
-            var existingOrg = _context.OrganisationReg.FirstOrDefault(e=>e.Email == request.Email);
-            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            var userExist = await _userManager.FindByEmailAsync(request.Email);
+            if (userExist != null)
+            {
+                throw new InvalidOperationException("user with this email already exist");
+            }
+            //ORGANISATION
+            var Org = new Organisation()
+            {
+                Id = Guid.NewGuid().ToString(),
+                OrganisationName = request.SchoolName,
+            };
+
+            _context.Organisation.Add(Org);
+
+        
+
+            CreatePasswordSalt(request.Password, out byte[] passwordSalt);
             user.Email = request.Email;
             user.SchoolName = request.SchoolName;
-            user.PasswordHash = passwordHash;
+            user.UserName = request.SchoolName;
             user.PasswordSalt = passwordSalt;
             user.Address = request.Address;
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.PhoneNumber = request.PhoneNumber;
             user.Role = "SuperAdmin";
+            user.OrgId = Org.Id;
 
-             _context.OrganisationReg.Add(user);
-            await _context.SaveChangesAsync();
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException("Something went wrong :(");
+            }
+            //else
+            //{
+            //    //ROLES CREATION
+            //    if(!await _roleManager.RoleExistsAsync(SD.SuperAdmin))
+            //    {
+            //        await _roleManager.CreateAsync(new IdentityRole(SD.SuperAdmin));
+            //    }
+            //    if(!await _roleManager.RoleExistsAsync(SD.Admin))
+            //    {
+            //        await _roleManager.CreateAsync(new IdentityRole(SD.Admin));
+            //    }
+            //    if(!await _roleManager.RoleExistsAsync(SD.Teacher))
+            //    {
+            //        await _roleManager.CreateAsync(new IdentityRole(SD.Teacher));
+            //    }
+            //    if(!await _roleManager.RoleExistsAsync(SD.Student))
+            //    {
+            //        await _roleManager.CreateAsync(new IdentityRole(SD.Student));
+            //    }
+            //    if(!await _roleManager.RoleExistsAsync(SD.Parent))
+            //    {
+            //        await _roleManager.CreateAsync(new IdentityRole(SD.Parent));
+            //    }
+
+            //    //ASSIGNING SUPER ADMIN ROLE
+            //    await _userManager.AddToRoleAsync(user, SD.SuperAdmin);
+
+            //}
+            _context.SaveChanges();
             return user;
+            
         }
 
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        private void CreatePasswordSalt(string password, out byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512())
             {
                 passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
 
-        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-        {
-            using(var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return computeHash.SequenceEqual(passwordHash);
-            }
-        }
-        
-        
-        public async Task<string> Login(UserLoginDto request)
-        {
-            var loginUser = await _context.OrganisationReg.FirstOrDefaultAsync(o=>o.Email == request.EmailAddress);
-            if(loginUser == null)
-            {
-                return null;
-            }
-  
-            if(!VerifyPasswordHash(request.Password, loginUser.PasswordHash, loginUser.PasswordSalt))
-            {
-                return null;
-            }
-            user = loginUser;
-            string token = CreateToken(user);
-            return token;
-        }
+       
 
-        private string CreateToken(OrganisationRegistration user)
-        {
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
-            };
-            var Key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                _configuration.GetSection("JwtTokens:Key").Value));
-            var creds = new SigningCredentials(Key, SecurityAlgorithms.HmacSha512Signature);
-            var token = new JwtSecurityToken(
-                claims : claims,
-                expires : DateTime.Now.AddDays(1),
-                signingCredentials: creds
-                );
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-            return jwt;
-        }
 
     }
 }

@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SchoolManagementSystemApi.Data;
+using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Services.SchoolRegistration;
+using SchoolManagementSystemApi.Services.UserAuthentication;
+using SchoolManagementSystemApi.Services.UserAuthorization;
 using Swashbuckle.AspNetCore.Filters;
+
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,8 +18,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddEndpointsApiExplorer(); 
+builder.Services.AddIdentity<OrganisationRegistration, IdentityRole>()
+    .AddEntityFrameworkStores<ApiDbContext>()
+    .AddDefaultTokenProviders();
+//Connect intertaces with services
 builder.Services.AddScoped<IRegServices, RegServices>();
+builder.Services.AddScoped<ILoginServices, LoginServices>();
+//
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options => 
 {

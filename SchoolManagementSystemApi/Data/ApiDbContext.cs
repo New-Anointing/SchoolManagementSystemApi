@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SchoolManagementSystemApi.Model;
 
 namespace SchoolManagementSystemApi.Data
 {
-    public class ApiDbContext : DbContext
+    public class ApiDbContext : IdentityDbContext
     {
         public ApiDbContext(DbContextOptions<ApiDbContext> options)
             : base(options)
@@ -11,5 +12,6 @@ namespace SchoolManagementSystemApi.Data
 
         }
         public DbSet<OrganisationRegistration> OrganisationReg { get; set; }
+        public DbSet<Organisation> Organisation { get; set; }
     }
 }

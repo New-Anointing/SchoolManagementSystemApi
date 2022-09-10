@@ -1,6 +1,6 @@
 ﻿namespace SchoolManagementSystemApi.Model
 {
-    public class UserCreation
+    public class ApplicationUser
     {
         public Guid Id { get; set; }
         public string FirstName { get; set; }
@@ -11,13 +11,6 @@
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
         public string? SchoolId { get; set; }
-        public Roles Role { get; set; }
-        
-
-        public enum Roles
-        {
-            Admin, Student, Parent, Teacher
-        }
 
     }
 }
