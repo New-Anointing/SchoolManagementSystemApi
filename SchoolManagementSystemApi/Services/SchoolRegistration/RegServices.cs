@@ -70,34 +70,34 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
             {
                 throw new InvalidOperationException("Something went wrong :(");
             }
-            //else
-            //{
-            //    //ROLES CREATION
-            //    if(!await _roleManager.RoleExistsAsync(SD.SuperAdmin))
-            //    {
-            //        await _roleManager.CreateAsync(new IdentityRole(SD.SuperAdmin));
-            //    }
-            //    if(!await _roleManager.RoleExistsAsync(SD.Admin))
-            //    {
-            //        await _roleManager.CreateAsync(new IdentityRole(SD.Admin));
-            //    }
-            //    if(!await _roleManager.RoleExistsAsync(SD.Teacher))
-            //    {
-            //        await _roleManager.CreateAsync(new IdentityRole(SD.Teacher));
-            //    }
-            //    if(!await _roleManager.RoleExistsAsync(SD.Student))
-            //    {
-            //        await _roleManager.CreateAsync(new IdentityRole(SD.Student));
-            //    }
-            //    if(!await _roleManager.RoleExistsAsync(SD.Parent))
-            //    {
-            //        await _roleManager.CreateAsync(new IdentityRole(SD.Parent));
-            //    }
+            else
+            {
+                //ROLES CREATION
+                if (!await _roleManager.RoleExistsAsync(SD.SuperAdmin))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(SD.SuperAdmin));
+                }
+                if (!await _roleManager.RoleExistsAsync(SD.Admin))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(SD.Admin));
+                }
+                if (!await _roleManager.RoleExistsAsync(SD.Teacher))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(SD.Teacher));
+                }
+                if (!await _roleManager.RoleExistsAsync(SD.Student))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(SD.Student));
+                }
+                if (!await _roleManager.RoleExistsAsync(SD.Parent))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(SD.Parent));
+                }
 
-            //    //ASSIGNING SUPER ADMIN ROLE
-            //    await _userManager.AddToRoleAsync(user, SD.SuperAdmin);
+                //ASSIGNING SUPER ADMIN ROLE
+                await _userManager.AddToRoleAsync(user, SD.SuperAdmin);
 
-            //}
+            }
             _context.SaveChanges();
             return user;
             

@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer(); 
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddIdentity<OrganisationRegistration, IdentityRole>()
     .AddEntityFrameworkStores<ApiDbContext>()
     .AddDefaultTokenProviders();
@@ -27,7 +27,7 @@ builder.Services.AddScoped<IRegServices, RegServices>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
 //
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSwaggerGen(options => 
+builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
@@ -42,8 +42,13 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddDbContext<ApiDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}
+).AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {

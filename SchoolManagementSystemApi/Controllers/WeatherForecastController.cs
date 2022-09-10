@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SchoolManagementSystemApi.Utilities;
 
 namespace SchoolManagementSystemApi.Controllers
 {
-    [ApiController]
+    [ApiController, Authorize(Roles = SD.SuperAdmin)]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
@@ -19,7 +20,7 @@ namespace SchoolManagementSystemApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast"), Authorize(Roles = "SuperAdmin")]
+        [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
