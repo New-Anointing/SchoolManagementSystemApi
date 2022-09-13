@@ -5,7 +5,7 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
 {
     public interface IRegServices
     {
-        Task<OrganisationRegistration> SchoolRegistration(SchoolRegistrationDTO request);
+        Task<ApplicationUser> SchoolRegistration(AdminUserDTO request);
        
     }
 }

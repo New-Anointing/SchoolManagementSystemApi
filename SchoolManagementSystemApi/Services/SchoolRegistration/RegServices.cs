@@ -14,14 +14,14 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
     {
         private readonly ApiDbContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<OrganisationRegistration> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private IConfiguration _configuration;
-        public static OrganisationRegistration user = new();
+        private static ApplicationUser user = new();
         public RegServices
         (
             ApiDbContext context,
             IConfiguration configuration,
-            UserManager<OrganisationRegistration> userManager,
+            UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager
         )
         {
@@ -35,9 +35,9 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
 
 
 
-        public async Task<OrganisationRegistration> SchoolRegistration(SchoolRegistrationDTO request)
+        public async Task<ApplicationUser> SchoolRegistration(AdminUserDTO request)
         {
-            var userExist = await _userManager.FindByEmailAsync(request.Email);
+            var userExist = await _userManager.FindByEmailAsync(request.EmailAddress);
             if (userExist != null)
             {
                 throw new InvalidOperationException("user with this email already exist");
@@ -46,24 +46,23 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
             var Org = new Organisation()
             {
                 Id = Guid.NewGuid().ToString(),
-                OrganisationName = request.SchoolName,
+                SchoolName = request.SchoolName,
+                Address = request.SchoolAddress
             };
 
             _context.Organisation.Add(Org);
 
-        
 
-            CreatePasswordSalt(request.Password, out byte[] passwordSalt);
-            user.Email = request.Email;
-            user.SchoolName = request.SchoolName;
-            user.UserName = request.SchoolName;
-            user.PasswordSalt = passwordSalt;
-            user.Address = request.Address;
+            user.Email = request.EmailAddress;
+            user.UserName = request.EmailAddress;
+            user.HomeAdddress = request.HomeAdddress;
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.PhoneNumber = request.PhoneNumber;
             user.Role = "SuperAdmin";
             user.OrgId = Org.Id;
+            user.Gender = request.Gender;
+            user.DateOfBirth = request.DateOfBirth;
 
             var result = await _userManager.CreateAsync(user, request.Password);
             if (!result.Succeeded)
@@ -100,19 +99,8 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
             }
             _context.SaveChanges();
             return user;
-            
+
         }
-
-        private void CreatePasswordSalt(string password, out byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-            }
-        }
-
-       
-
 
     }
 }

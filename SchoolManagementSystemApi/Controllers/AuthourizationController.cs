@@ -18,18 +18,18 @@ namespace SchoolManagementSystemApi.Controllers
             _loginServices = loginServices;
         }
         [HttpPost("Login")]
-        public async Task<IActionResult> Login(UserLoginDto request)
+        public IActionResult Login(UserLoginDto request)
         {
             try
             {
-                await _loginServices.Login(request);
+               // await _loginServices.Login(request);
+            return Ok(new { Value = _loginServices.Login(request) });
             }
             catch (ArgumentException)
             {
-                NotFound("User not found or incorrect password");
+                return NotFound("User not found or incorrect password");
             }
 
-            return Ok(new { Value = _loginServices.Login(request) });
 
 
         }

@@ -17,7 +17,7 @@ namespace SchoolManagementSystemApi.Controllers
         [HttpPost("SchoolRegistration")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<ActionResult> SchoolRegistration(SchoolRegistrationDTO request)
+        public async Task<ActionResult> SchoolRegistration(AdminUserDTO request)
         {
             try
             {

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.DTOModel;
@@ -7,7 +6,6 @@ using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Services.UserAuthorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace SchoolManagementSystemApi.Services.UserAuthentication
@@ -16,13 +14,13 @@ namespace SchoolManagementSystemApi.Services.UserAuthentication
     {
         private readonly ApiDbContext _context;
         private IConfiguration _configuration;
-        private readonly UserManager<OrganisationRegistration> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public LoginServices
         (
             ApiDbContext context,
             IConfiguration configuration,
-            UserManager<OrganisationRegistration> userManager
+            UserManager<ApplicationUser> userManager
         )
         {
             _context = context;
@@ -47,7 +45,9 @@ namespace SchoolManagementSystemApi.Services.UserAuthentication
             throw new InvalidOperationException("Incorrect Passwoord");
         }
 
-        private async Task<string> CreateToken(OrganisationRegistration user)
+
+
+        private async Task<string> CreateToken(ApplicationUser user)
         {
             var userRoles =  await _userManager.GetRolesAsync(user);
             List<Claim> claims = new List<Claim>

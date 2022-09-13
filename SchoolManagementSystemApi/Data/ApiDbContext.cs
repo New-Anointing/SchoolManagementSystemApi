@@ -11,7 +11,7 @@ namespace SchoolManagementSystemApi.Data
         {
 
         }
-        public DbSet<OrganisationRegistration> OrganisationReg { get; set; }
+        public DbSet<ApplicationUser> ApplicationUser { get; set; }
         public DbSet<Organisation> Organisation { get; set; }
     }
 }

@@ -6,6 +6,9 @@ namespace SchoolManagementSystemApi.Model
     {
         [Key]
         public string Id { get; set; }
-        public string OrganisationName { get; set; }
+        [Required]
+        public string? SchoolName { get; set; }
+        [Required]
+        public string? Address { get; set; }
     }
 }
