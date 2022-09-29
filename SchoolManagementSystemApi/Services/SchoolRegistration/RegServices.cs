@@ -3,10 +3,7 @@ using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.DTOModel;
 using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Utilities;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace SchoolManagementSystemApi.Services.SchoolRegistration
 {
@@ -15,23 +12,35 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
         private readonly ApiDbContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private static ApplicationUser user = new();
         public RegServices
         (
             ApiDbContext context,
-            IConfiguration configuration,
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager
+            RoleManager<IdentityRole> roleManager,
+            IHttpContextAccessor httpContextAccessor
         )
         {
             _context = context;
-            _configuration = configuration;
             _userManager = userManager;
             _roleManager = roleManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
+        private string GetOrg()
+        {
+            string claim = string.Empty;
+            if (_httpContextAccessor.HttpContext != null)
+            {
+                claim = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            }
+
+            var orgId = _context.ApplicationUser.Where(c => c.Id == claim).FirstOrDefault().OrgId;
+
+            return orgId;
+        }
 
 
 
@@ -102,5 +111,48 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
 
         }
 
+        public async Task<ApplicationUser> UserRegistration(UserDTO request)
+        {
+            var userExist = await _userManager.FindByEmailAsync(request.EmailAddress);
+            if (userExist != null)
+            {
+                throw new InvalidOperationException("user with this email already exist");
+            }
+
+            user.UserName = request.EmailAddress;
+            user.Email = request.EmailAddress;
+            user.HomeAdddress = request.HomeAdddress;
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.PhoneNumber = request.PhoneNumber;
+            user.OrgId = GetOrg();
+            user.Gender = request.Gender.ToString();
+            user.DateOfBirth = request.DateOfBirth;
+            user.Role = request.Role.ToString();
+
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException("Something went wrong :(");
+            }
+            else
+            {
+                //ASSIGNING ROLES TO CREATED USER
+                if(request.Role.ToString() == SD.Admin)
+                {
+                    await _userManager.AddToRoleAsync(user, SD.Admin);
+                }else if(request.Role.ToString() == SD.Teacher)
+                {
+                    await _userManager.AddToRoleAsync(user, SD.Teacher);
+                }else if(request.Role.ToString() ==SD.Student)
+                {
+                    await _userManager.AddToRoleAsync(user, SD.Student);
+                }else if(request.Role.ToString() == SD.Parent)
+                {
+                    await _userManager.AddToRoleAsync(user, SD.Teacher);
+                }
+            }
+            return user;
+        }
     }
 }

@@ -6,17 +6,22 @@ using Microsoft.OpenApi.Models;
 using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Services.SchoolRegistration;
+using SchoolManagementSystemApi.Services.StudentClass;
 using SchoolManagementSystemApi.Services.UserAuthentication;
 using SchoolManagementSystemApi.Services.UserAuthorization;
 using Swashbuckle.AspNetCore.Filters;
 
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(x =>
+{
+    x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -25,6 +30,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 //Connect intertaces with services
 builder.Services.AddScoped<IRegServices, RegServices>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
+builder.Services.AddScoped<IClassRoom, ClassRoomServices>();
+
 //
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
@@ -38,7 +45,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
-
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "School Management Syetem Api", Version="v1"});
 });
 builder.Services.AddDbContext<ApiDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));

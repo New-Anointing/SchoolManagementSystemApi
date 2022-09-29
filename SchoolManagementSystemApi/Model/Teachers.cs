@@ -11,6 +11,7 @@
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
         public string? SchoolId { get; set; }
+        public string salary { get; set; }
 
     }
 }

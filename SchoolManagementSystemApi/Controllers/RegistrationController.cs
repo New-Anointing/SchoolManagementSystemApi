@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagementSystemApi.DTOModel;
 using SchoolManagementSystemApi.Services.SchoolRegistration;
+using SchoolManagementSystemApi.Utilities;
 
 namespace SchoolManagementSystemApi.Controllers
 {
@@ -9,11 +10,16 @@ namespace SchoolManagementSystemApi.Controllers
     [ApiController]
     public class RegistrationController : ControllerBase
     {
-        private IRegServices _iorgRegServices;
-        public RegistrationController(IRegServices iorgRegServices)
+        private IRegServices _iRegServices;
+        public RegistrationController(IRegServices iRegServices)
         {
-            _iorgRegServices = iorgRegServices;
+            _iRegServices = iRegServices;
         }
+        /// <summary>
+        ///     Register A School.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("SchoolRegistration")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -21,7 +27,23 @@ namespace SchoolManagementSystemApi.Controllers
         {
             try
             {
-                await _iorgRegServices.SchoolRegistration(request);
+                await _iRegServices.SchoolRegistration(request);
+            }
+            catch(ArgumentException)
+            {
+                return Conflict();
+            }
+            return Created("", Ok("User Created Successfully"));
+        }
+        [HttpPost("UsersRegistration")]
+        [Authorize(Roles = SD.Admin +","+ SD.SuperAdmin)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult> UserRegistration(UserDTO request)
+        {
+            try
+            {
+                await _iRegServices.UserRegistration(request);
             }
             catch(ArgumentException)
             {
