@@ -2,7 +2,7 @@
 
 namespace SchoolManagementSystemApi.DTOModel
 {
-    public class TeahersDTO : IdentityUser
+    public class TeahersDTO
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
