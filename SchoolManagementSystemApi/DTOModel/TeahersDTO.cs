@@ -12,6 +12,7 @@ namespace SchoolManagementSystemApi.DTOModel
         public string? PhoneNumber { get; set; }
         public string? Gender { get; set; }
 
+
         
     }
 }

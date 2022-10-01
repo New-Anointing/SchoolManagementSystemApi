@@ -2,7 +2,7 @@
 
 namespace SchoolManagementSystemApi.Model
 {
-    public class Organisation
+    public class Organisation : BaseClass
     {
         [Key]
         public string Id { get; set; }

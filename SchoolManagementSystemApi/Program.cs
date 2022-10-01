@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.Model;
+using SchoolManagementSystemApi.Services.RolesInitializer;
 using SchoolManagementSystemApi.Services.SchoolRegistration;
 using SchoolManagementSystemApi.Services.StudentClass;
 using SchoolManagementSystemApi.Services.UserAuthentication;
@@ -31,6 +32,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.AddScoped<IRegServices, RegServices>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
 builder.Services.AddScoped<IClassRoom, ClassRoomServices>();
+builder.Services.AddScoped<IRolesDbInitializer, RolesDbInitializer>();
 
 //
 builder.Services.AddHttpContextAccessor();
@@ -77,6 +79,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -86,3 +89,12 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+void SeedDatabase()
+{
+    using(var scope = app.Services.CreateScope())
+    {
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IRolesDbInitializer>();
+        dbInitializer.Initialize();
+    }
+}
