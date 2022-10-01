@@ -28,10 +28,10 @@ namespace SchoolManagementSystemApi.Controllers
 
 
         [HttpPost("CreateClass")]
-        [ProducesResponseType(typeof(ClassRoom), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ClassRoomDTO), StatusCodes.Status201Created)]
         public async Task<IActionResult> CreateClass(ClassRoomDTO request)
         {
-            _iClassRoom.CreateClass(request);
+            await _iClassRoom.CreateClass(request);
             return CreatedAtAction(nameof(GetClassById), request);
         }
 
@@ -40,7 +40,7 @@ namespace SchoolManagementSystemApi.Controllers
 
 
         [HttpGet("GetAllClass")]
-        [ProducesResponseType(typeof(ClassRoom), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ClassRoomDTO), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllClass()
         {
             return Ok (await _iClassRoom.GetAllClass());
@@ -51,7 +51,7 @@ namespace SchoolManagementSystemApi.Controllers
 
 
         [HttpGet("GetClassById/{id}")]
-        [ProducesResponseType(typeof(ClassRoom), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ClassRoomDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetClassById(Guid id)
         {
