@@ -29,7 +29,7 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
         }
 
 
-        private string GetOrg()
+        private Guid GetOrg()
         {
             string claim = string.Empty;
             if (_httpContextAccessor.HttpContext != null)
@@ -37,7 +37,7 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                 claim = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             }
 
-            var orgId = _context.ApplicationUser.Where(c => c.Id == claim).FirstOrDefault().OrgId;
+            var orgId = _context.ApplicationUser.Where(c => c.Id == claim).FirstOrDefault().OrganisationId;
 
             return orgId;
         }
@@ -52,11 +52,14 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                 throw new InvalidOperationException("user with this email already exist");
             }
             //ORGANISATION
+            var OrgId = Guid.NewGuid();
+
             var Org = new Organisation()
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = OrgId.ToString(),
+                OrganisationId = OrgId,
                 SchoolName = request.SchoolName,
-                Address = request.SchoolAddress
+                Address = request.SchoolAddress,
             };
 
             _context.Organisation.Add(Org);
@@ -64,12 +67,12 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
 
             user.Email = request.EmailAddress;
             user.UserName = request.EmailAddress;
-            user.HomeAdddress = request.HomeAdddress;
+            user.HomeAddress = request.HomeAddress;
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.PhoneNumber = request.PhoneNumber;
             user.Role = "SuperAdmin";
-            user.OrgId = Org.Id;
+            user.OrganisationId = Org.OrganisationId;
             user.Gender = request.Gender;
             user.DateOfBirth = request.DateOfBirth;
 
@@ -80,28 +83,6 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
             }
             else
             {
-                //ROLES CREATION
-                if (!await _roleManager.RoleExistsAsync(SD.SuperAdmin))
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(SD.SuperAdmin));
-                }
-                if (!await _roleManager.RoleExistsAsync(SD.Admin))
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(SD.Admin));
-                }
-                if (!await _roleManager.RoleExistsAsync(SD.Teacher))
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(SD.Teacher));
-                }
-                if (!await _roleManager.RoleExistsAsync(SD.Student))
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(SD.Student));
-                }
-                if (!await _roleManager.RoleExistsAsync(SD.Parent))
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(SD.Parent));
-                }
-
                 //ASSIGNING SUPER ADMIN ROLE
                 await _userManager.AddToRoleAsync(user, SD.SuperAdmin);
 
@@ -121,11 +102,11 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
 
             user.UserName = request.EmailAddress;
             user.Email = request.EmailAddress;
-            user.HomeAdddress = request.HomeAdddress;
+            user.HomeAddress = request.HomeAddress;
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.PhoneNumber = request.PhoneNumber;
-            user.OrgId = GetOrg();
+            user.OrganisationId = GetOrg();
             user.Gender = request.Gender.ToString();
             user.DateOfBirth = request.DateOfBirth;
             user.Role = request.Role.ToString();

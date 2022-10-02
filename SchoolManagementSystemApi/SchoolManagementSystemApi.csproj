@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
+    <Folder Include="Services\NewFolder\" />
     <Folder Include="Services\UsersRegistration\" />
   </ItemGroup>
 
