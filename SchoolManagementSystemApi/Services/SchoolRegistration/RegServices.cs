@@ -31,7 +31,7 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
         }
 
 
-        private string GetOrg()
+        private Guid GetOrg()
         {
             string claim = string.Empty;
             if (_httpContextAccessor.HttpContext != null)
@@ -39,7 +39,7 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                 claim = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             }
 
-            var orgId = _context.ApplicationUser.FirstOrDefault(c => c.Id == claim)?.OrgId;
+            var orgId = _context.ApplicationUser.FirstOrDefault(c => c.Id == claim).OrganisationId;
 
             return orgId;
         }
@@ -62,11 +62,13 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                     };
                 }
                 //ORGANISATION
+                var orgId = Guid.NewGuid();
                 var Org = new Organisation()
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = orgId.ToString(),
                     SchoolName = request.SchoolName,
-                    Address = request.SchoolAddress
+                    Address = request.SchoolAddress,
+                    OrganisationId = orgId
                 };
 
                 _context.Organisation.Add(Org);
@@ -74,12 +76,12 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
 
                 user.Email = request.EmailAddress;
                 user.UserName = request.EmailAddress;
-                user.HomeAdddress = request.HomeAdddress;
+                user.HomeAddress = request.HomeAddress;
                 user.FirstName = request.FirstName;
                 user.LastName = request.LastName;
                 user.PhoneNumber = request.PhoneNumber;
                 user.Role = "SuperAdmin";
-                user.OrgId = Org.Id;
+                user.OrganisationId = Guid.Parse(Org.Id);
                 user.Gender = request.Gender;
                 user.DateOfBirth = request.DateOfBirth;
 
@@ -164,11 +166,11 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
 
                 user.UserName = request.EmailAddress;
                 user.Email = request.EmailAddress;
-                user.HomeAdddress = request.HomeAdddress;
+                user.HomeAddress = request.HomeAddress;
                 user.FirstName = request.FirstName;
                 user.LastName = request.LastName;
                 user.PhoneNumber = request.PhoneNumber;
-                user.OrgId = GetOrg();
+                user.OrganisationId = GetOrg();
                 user.Gender = request.Gender.ToString();
                 user.DateOfBirth = request.DateOfBirth;
                 user.Role = request.Role.ToString();
