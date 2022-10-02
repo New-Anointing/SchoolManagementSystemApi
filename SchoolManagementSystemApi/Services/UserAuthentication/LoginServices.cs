@@ -2,9 +2,11 @@
 using Microsoft.IdentityModel.Tokens;
 using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.DTOModel;
+using SchoolManagementSystemApi.Helpers;
 using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Services.UserAuthorization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -32,17 +34,43 @@ namespace SchoolManagementSystemApi.Services.UserAuthentication
 
 
 
-        public async Task<string> Login(UserLoginDto request)
+        public async Task<GenericResponse<string>> Login(UserLoginDto request)
         {
-            var userExist = await _userManager.FindByEmailAsync(request.EmailAddress);
-            if (userExist != null && await _userManager.CheckPasswordAsync(userExist, request.Password))            
+            
+            try
             {
+                var userExist = await _userManager.FindByEmailAsync(request.EmailAddress);
+                if (userExist != null && await _userManager.CheckPasswordAsync(userExist, request.Password))
+                {
 
-                var token = CreateToken(userExist).Result;
-                return token;
+                    var token = CreateToken(userExist).Result;
+                    return new GenericResponse<string>
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Data = token,
+                        Message = "Login successful",
+                        Success = true
+                    };
 
+                }
+                return new GenericResponse<string>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Data = null,
+                    Message = "Incorrect Passwoord Or User Doesn't Exist",
+                    Success = false
+                };
             }
-            throw new InvalidOperationException("Incorrect Passwoord Or User Doesn't Exist");
+            catch (Exception e)
+            {
+                return new GenericResponse<string>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = "An error occurred: " + e.Message,
+                    Success = false
+                };
+            }
         }
 
 

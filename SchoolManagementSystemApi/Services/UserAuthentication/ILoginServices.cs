@@ -1,9 +1,10 @@
 ﻿using SchoolManagementSystemApi.DTOModel;
+using SchoolManagementSystemApi.Helpers;
 
 namespace SchoolManagementSystemApi.Services.UserAuthorization
 {
     public interface ILoginServices
     {
-         Task<string> Login(UserLoginDto request);
+         Task<GenericResponse<string>> Login(UserLoginDto request);
     }
 }

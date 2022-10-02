@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.DTOModel;
+using SchoolManagementSystemApi.Helpers;
 using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Utilities;
+using System.Net;
 using System.Security.Claims;
 
 namespace SchoolManagementSystemApi.Services.SchoolRegistration
@@ -37,103 +39,192 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                 claim = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             }
 
-            var orgId = _context.ApplicationUser.Where(c => c.Id == claim).FirstOrDefault().OrganisationId;
+            var orgId = _context.ApplicationUser.FirstOrDefault(c => c.Id == claim).OrganisationId;
 
             return orgId;
         }
 
 
 
-        public async Task<ApplicationUser> SchoolRegistration(AdminUserDTO request)
+        public async Task<GenericResponse<ApplicationUser>> SchoolRegistration(AdminUserDTO request)
         {
-            var userExist = await _userManager.FindByEmailAsync(request.EmailAddress);
-            if (userExist != null)
+            try
             {
-                throw new InvalidOperationException("user with this email already exist");
+                var userExist = await _userManager.FindByEmailAsync(request.EmailAddress);
+                if (userExist != null)
+                {
+                    return new GenericResponse<ApplicationUser>
+                    {
+                        StatusCode = HttpStatusCode.ExpectationFailed,
+                        Data = null,
+                        Message = "User with this email already exist",
+                        Success = false
+                    };
+                }
+                //ORGANISATION
+                var orgId = Guid.NewGuid();
+                var Org = new Organisation()
+                {
+                    Id = orgId.ToString(),
+                    SchoolName = request.SchoolName,
+                    Address = request.SchoolAddress,
+                    OrganisationId = orgId
+                };
+
+                _context.Organisation.Add(Org);
+
+
+                user.Email = request.EmailAddress;
+                user.UserName = request.EmailAddress;
+                user.HomeAddress = request.HomeAddress;
+                user.FirstName = request.FirstName;
+                user.LastName = request.LastName;
+                user.PhoneNumber = request.PhoneNumber;
+                user.Role = "SuperAdmin";
+                user.OrganisationId = Guid.Parse(Org.Id);
+                user.Gender = request.Gender;
+                user.DateOfBirth = request.DateOfBirth;
+
+                var result = await _userManager.CreateAsync(user, request.Password);
+                if (!result.Succeeded)
+                {
+                    return new GenericResponse<ApplicationUser>
+                    {
+                        StatusCode = HttpStatusCode.ExpectationFailed,
+                        Data = null,
+                        Message = "Something went wrong :(",
+                        Success = false
+                    };
+                }
+                else
+                {
+                    //ROLES CREATION
+                    if (!await _roleManager.RoleExistsAsync(SD.SuperAdmin))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(SD.SuperAdmin));
+                    }
+                    if (!await _roleManager.RoleExistsAsync(SD.Admin))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(SD.Admin));
+                    }
+                    if (!await _roleManager.RoleExistsAsync(SD.Teacher))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(SD.Teacher));
+                    }
+                    if (!await _roleManager.RoleExistsAsync(SD.Student))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(SD.Student));
+                    }
+                    if (!await _roleManager.RoleExistsAsync(SD.Parent))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole(SD.Parent));
+                    }
+
+                    //ASSIGNING SUPER ADMIN ROLE
+                    await _userManager.AddToRoleAsync(user, SD.SuperAdmin);
+
+                }
+                _context.SaveChanges();
+                return new GenericResponse<ApplicationUser>
+                {
+                    StatusCode = HttpStatusCode.Created,
+                    Data = user,
+                    Message = "Registration is successful",
+                    Success = true
+                };
             }
-            //ORGANISATION
-            var OrgId = Guid.NewGuid();
-
-            var Org = new Organisation()
+            catch (Exception e)
             {
-                Id = OrgId.ToString(),
-                OrganisationId = OrgId,
-                SchoolName = request.SchoolName,
-                Address = request.SchoolAddress,
-            };
 
-            _context.Organisation.Add(Org);
-
-
-            user.Email = request.EmailAddress;
-            user.UserName = request.EmailAddress;
-            user.HomeAddress = request.HomeAddress;
-            user.FirstName = request.FirstName;
-            user.LastName = request.LastName;
-            user.PhoneNumber = request.PhoneNumber;
-            user.Role = "SuperAdmin";
-            user.OrganisationId = Org.OrganisationId;
-            user.Gender = request.Gender;
-            user.DateOfBirth = request.DateOfBirth;
-
-            var result = await _userManager.CreateAsync(user, request.Password);
-            if (!result.Succeeded)
-            {
-                throw new InvalidOperationException("Something went wrong :(");
+                return new GenericResponse<ApplicationUser>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = "An error occurred: " + e.Message,
+                    Success = false
+                };
             }
-            else
-            {
-                //ASSIGNING SUPER ADMIN ROLE
-                await _userManager.AddToRoleAsync(user, SD.SuperAdmin);
 
-            }
-            _context.SaveChanges();
-            return user;
 
         }
 
-        public async Task<ApplicationUser> UserRegistration(UserDTO request)
+        public async Task<GenericResponse<ApplicationUser>> UserRegistration(UserDTO request)
         {
-            var userExist = await _userManager.FindByEmailAsync(request.EmailAddress);
-            if (userExist != null)
+            try
             {
-                throw new InvalidOperationException("user with this email already exist");
-            }
-
-            user.UserName = request.EmailAddress;
-            user.Email = request.EmailAddress;
-            user.HomeAddress = request.HomeAddress;
-            user.FirstName = request.FirstName;
-            user.LastName = request.LastName;
-            user.PhoneNumber = request.PhoneNumber;
-            user.OrganisationId = GetOrg();
-            user.Gender = request.Gender.ToString();
-            user.DateOfBirth = request.DateOfBirth;
-            user.Role = request.Role.ToString();
-
-            var result = await _userManager.CreateAsync(user, request.Password);
-            if (!result.Succeeded)
-            {
-                throw new InvalidOperationException("Something went wrong :(");
-            }
-            else
-            {
-                //ASSIGNING ROLES TO CREATED USER
-                if(request.Role.ToString() == SD.Admin)
+                var userExist = await _userManager.FindByEmailAsync(request.EmailAddress);
+                if (userExist != null)
                 {
-                    await _userManager.AddToRoleAsync(user, SD.Admin);
-                }else if(request.Role.ToString() == SD.Teacher)
-                {
-                    await _userManager.AddToRoleAsync(user, SD.Teacher);
-                }else if(request.Role.ToString() ==SD.Student)
-                {
-                    await _userManager.AddToRoleAsync(user, SD.Student);
-                }else if(request.Role.ToString() == SD.Parent)
-                {
-                    await _userManager.AddToRoleAsync(user, SD.Teacher);
+                    return new GenericResponse<ApplicationUser>
+                    {
+                        StatusCode = HttpStatusCode.ExpectationFailed,
+                        Data = null,
+                        Message = "User with this email already exist",
+                        Success = false
+                    };
                 }
+
+                user.UserName = request.EmailAddress;
+                user.Email = request.EmailAddress;
+                user.HomeAddress = request.HomeAddress;
+                user.FirstName = request.FirstName;
+                user.LastName = request.LastName;
+                user.PhoneNumber = request.PhoneNumber;
+                user.OrganisationId = GetOrg();
+                user.Gender = request.Gender.ToString();
+                user.DateOfBirth = request.DateOfBirth;
+                user.Role = request.Role.ToString();
+
+                var result = await _userManager.CreateAsync(user, request.Password);
+                if (!result.Succeeded)
+                {
+                    return new GenericResponse<ApplicationUser>
+                    {
+                        StatusCode = HttpStatusCode.ExpectationFailed,
+                        Data = null,
+                        Message = "Something went wrong :(",
+                        Success = false
+                    };
+                }
+                else
+                {
+                    //ASSIGNING ROLES TO CREATED USER
+                    if (request.Role.ToString() == SD.Admin)
+                    {
+                        await _userManager.AddToRoleAsync(user, SD.Admin);
+                    }
+                    else if (request.Role.ToString() == SD.Teacher)
+                    {
+                        await _userManager.AddToRoleAsync(user, SD.Teacher);
+                    }
+                    else if (request.Role.ToString() == SD.Student)
+                    {
+                        await _userManager.AddToRoleAsync(user, SD.Student);
+                    }
+                    else if (request.Role.ToString() == SD.Parent)
+                    {
+                        await _userManager.AddToRoleAsync(user, SD.Teacher);
+                    }
+                }
+                return new GenericResponse<ApplicationUser>
+                {
+                    StatusCode = HttpStatusCode.Created,
+                    Data = user,
+                    Message = "User is created successfully",
+                    Success = true
+                };
             }
-            return user;
+            catch (Exception e)
+            {
+                return new GenericResponse<ApplicationUser>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = "An error occurred: " + e.Message,
+                    Success = false
+                };
+            }
+
         }
     }
 }
