@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagementSystemApi.DTOModel;
-using SchoolManagementSystemApi.Model;
+using SchoolManagementSystemApi.Helpers;
 using SchoolManagementSystemApi.Services.StudentClass;
 using SchoolManagementSystemApi.Utilities;
 
@@ -28,11 +27,12 @@ namespace SchoolManagementSystemApi.Controllers
 
 
         [HttpPost("CreateClass")]
-        [ProducesResponseType(typeof(ClassRoomDTO), StatusCodes.Status201Created)]
-        public async Task<IActionResult> CreateClass(ClassRoomDTO request)
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GenericResponse<ClassRoomDTO>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<ClassRoomDTO>))]
+        public async Task<ActionResult> CreateClass(ClassRoomDTO request)
         {
-            await _iClassRoom.CreateClass(request);
-            return CreatedAtAction(nameof(GetClassById), request);
+            var result = await _iClassRoom.CreateClass(request);
+            return StatusCode((int)result.StatusCode, result);
         }
 
 
@@ -40,10 +40,12 @@ namespace SchoolManagementSystemApi.Controllers
 
 
         [HttpGet("GetAllClass")]
-        [ProducesResponseType(typeof(ClassRoomDTO), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllClass()
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<IEnumerable<ClassRoomDTO>>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<IEnumerable<ClassRoomDTO>>))]
+        public async Task<ActionResult> GetAllClass()
         {
-            return Ok (await _iClassRoom.GetAllClass());
+            var result = await _iClassRoom.GetAllClass();
+            return StatusCode((int)result.StatusCode, result);
         }
 
 
@@ -51,44 +53,24 @@ namespace SchoolManagementSystemApi.Controllers
 
 
         [HttpGet("GetClassById/{id}")]
-        [ProducesResponseType(typeof(ClassRoomDTO), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetClassById(Guid id)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<ClassRoomDTO>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<ClassRoomDTO>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<ClassRoomDTO>))]
+        public async Task<ActionResult> GetClassById(Guid id)
         {
-            var exsistingClass = await _iClassRoom.GetClassById(id);
-            return exsistingClass == null ? NotFound() : Ok(exsistingClass);
+            var result = await _iClassRoom.GetClassById(id);
+            return StatusCode((int)result.StatusCode, result);
         }
 
 
 
-        [HttpPut("Update/{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> EditClass(Guid id, ClassRoomDTO request)
-        {
-            await _iClassRoom.EditClass(id , request);
-            return NoContent();
-        }
-
-
-        [HttpDelete("DeleteClass/id")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteClass(Guid id)
-        {
-            try
-            {
-                await _iClassRoom.DeleteClass(id);
-                return NoContent();
-            }
-            catch(ArgumentException ex)
-            {
-                return NotFound();
-            }
-        }
-
-
-
-
+        //[HttpPut("EditClass/{id}")]
+        //[ProducesResponseType(StatusCodes.Status204NoContent)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //public async Task<ActionResult> EditClass(Guid id, ClassRoomDTO request)
+        //{
+        //    await _iClassRoom.EditClass(id , request);
+        //    return NoContent();
+        //}
     }
 }

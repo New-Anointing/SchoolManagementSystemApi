@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.DTOModel;
+using SchoolManagementSystemApi.Helpers;
 using SchoolManagementSystemApi.Model;
+using System.Net;
 using System.Security.Claims;
 
 namespace SchoolManagementSystemApi.Services.StudentClass
@@ -33,56 +35,126 @@ namespace SchoolManagementSystemApi.Services.StudentClass
             return orgId;
         }
 
-        public async Task<ClassRoom> CreateClass(ClassRoomDTO request)
+        public async Task<GenericResponse<ClassRoom>> CreateClass(ClassRoomDTO request)
         {
-            classRoom.Class = request.Class;
-            classRoom.ShortCode = request.ShortCode;
-            classRoom.OrganisationId = GetOrg();
-            await _context.ClassRoom.AddAsync(classRoom);
-            await _context.SaveChangesAsync();
-            return classRoom;
-
-        }
-        public async Task<IEnumerable<ClassRoom>> GetAllClass()
-        {
-            var classRooms = await _context.ClassRoom.Where(c => c.OrganisationId == GetOrg()).ToListAsync();
-            return classRooms;
-        }
-
-
-        public async Task<ClassRoom> GetClassById(Guid id)
-        {
-            return await _context.ClassRoom.FirstOrDefaultAsync(c => c.Id == id);
-        }
-
-        public async Task<ClassRoom> EditClass(Guid id, ClassRoomDTO request)
-        {
-
-            var classToEdit = GetClassById(id).Result;
-            if(!string.IsNullOrEmpty(request.Class))
+            try
             {
-                classToEdit.Class = request.Class;
+                classRoom.Class = request.Class;
+                classRoom.ShortCode = request.ShortCode;
+                classRoom.OrganisationId = GetOrg();
+                classRoom.Id =  Guid.NewGuid();
+                await _context.ClassRoom.AddAsync(classRoom);
+                await _context.SaveChangesAsync();
+                return new GenericResponse<ClassRoom>
+                {
+                    StatusCode = HttpStatusCode.Created,
+                    Data = classRoom,
+                    Message = "Class was created successfully",
+                    Success = true
+                };
             }
-            if (!string.IsNullOrEmpty(request.ShortCode))
+            catch(Exception e)
             {
-                classToEdit.ShortCode = request.ShortCode;
+                return new GenericResponse<ClassRoom>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = e.Message,
+                    Success = false
+                };
             }
-            classToEdit.DateModified = DateTime.Now;
-            _context.Update(classToEdit);
-            await _context.SaveChangesAsync();
-            return classToEdit;
+            
 
         }
-        public async Task DeleteClass(Guid id)
+        public async Task<GenericResponse<IEnumerable<ClassRoom>>> GetAllClass()
         {
-            var classRoomToDelete = await _context.ClassRoom.FindAsync(id);
-            if(classRoomToDelete == null)
+            try
             {
-                throw new ArgumentException("No Class with this given id exist", nameof(id));
+                var classRooms = await _context.ClassRoom.Where(c => c.OrganisationId == GetOrg()).ToListAsync();
+                return new GenericResponse<IEnumerable<ClassRoom>>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Data = classRooms,
+                    Message = "Data loaded successfully",
+                    Success = true
+                };
             }
-            _context.ClassRoom.Remove(classRoomToDelete);
-            await _context.SaveChangesAsync();
+            catch(Exception e)
+            {
+                return new GenericResponse<IEnumerable<ClassRoom>>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = "An error occurred: " + e.Message,
+                    Success = false
+                };
+            }
         }
+
+
+        public async Task<GenericResponse<ClassRoom>> GetClassById(Guid id)
+        {
+            try
+            {
+                var classRoom = await _context.ClassRoom.FirstOrDefaultAsync(c => c.Id == id);
+                if(classRoom == null)
+                {
+                    return new GenericResponse<ClassRoom>
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Data = null,
+                        Message = "No Class with this id exist :(",
+                        Success = false
+                    };
+                }
+                return new GenericResponse<ClassRoom>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Data = classRoom,
+                    Message = "Data loaded successfully",
+                    Success = true
+                };
+            }
+            catch(Exception e)
+            {
+                return new GenericResponse<ClassRoom>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = "An error occurred: " + e.Message,
+                    Success = false
+                };
+            }
+        }
+
+        //public async Task<GenericResponse<ClassRoom>> EditClass(Guid id, ClassRoomDTO request)
+        //{
+
+        //    var classToEdit = GetClassById(id).Result;
+        //    if (classToEdit.Success == false)
+        //    {
+        //        return new GenericResponse<ClassRoom>
+        //        {
+        //            StatusCode = HttpStatusCode.NotFound,
+        //            Data = null,
+        //            Message = "No Class with this id exist :(",
+        //            Success = false
+        //        };
+        //    }
+        //    if(!string.IsNullOrEmpty(request.Class))
+        //    {
+        //        classToEdit.Data.Class = request.Class;
+        //    }
+        //    if (!string.IsNullOrEmpty(request.ShortCode))
+        //    {
+        //        classToEdit.Data.ShortCode = request.ShortCode;
+        //    }
+        //    classToEdit.Data.DateModified = DateTime.Now;
+        //    _context.Update(classToEdit);
+        //    await _context.SaveChangesAsync();
+        //    return classToEdit;
+
+        //}
 
     }
 }

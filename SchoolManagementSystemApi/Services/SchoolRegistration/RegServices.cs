@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.DTOModel;
 using SchoolManagementSystemApi.Helpers;
@@ -80,7 +81,7 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                 user.FirstName = request.FirstName;
                 user.LastName = request.LastName;
                 user.PhoneNumber = request.PhoneNumber;
-                user.Role = "SuperAdmin";
+                user.Role = SD.SuperAdmin;
                 user.OrganisationId = Guid.Parse(Org.Id);
                 user.Gender = request.Gender;
                 user.DateOfBirth = request.DateOfBirth;
@@ -92,34 +93,13 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                     {
                         StatusCode = HttpStatusCode.ExpectationFailed,
                         Data = null,
-                        Message = "Something went wrong :(",
+                        Message = "Something went wrong :(" +
+                        "Check and validate all inputs",
                         Success = false
                     };
                 }
                 else
                 {
-                    //ROLES CREATION
-                    if (!await _roleManager.RoleExistsAsync(SD.SuperAdmin))
-                    {
-                        await _roleManager.CreateAsync(new IdentityRole(SD.SuperAdmin));
-                    }
-                    if (!await _roleManager.RoleExistsAsync(SD.Admin))
-                    {
-                        await _roleManager.CreateAsync(new IdentityRole(SD.Admin));
-                    }
-                    if (!await _roleManager.RoleExistsAsync(SD.Teacher))
-                    {
-                        await _roleManager.CreateAsync(new IdentityRole(SD.Teacher));
-                    }
-                    if (!await _roleManager.RoleExistsAsync(SD.Student))
-                    {
-                        await _roleManager.CreateAsync(new IdentityRole(SD.Student));
-                    }
-                    if (!await _roleManager.RoleExistsAsync(SD.Parent))
-                    {
-                        await _roleManager.CreateAsync(new IdentityRole(SD.Parent));
-                    }
-
                     //ASSIGNING SUPER ADMIN ROLE
                     await _userManager.AddToRoleAsync(user, SD.SuperAdmin);
 
@@ -182,7 +162,8 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                     {
                         StatusCode = HttpStatusCode.ExpectationFailed,
                         Data = null,
-                        Message = "Something went wrong :(",
+                        Message = "Something went wrong :( " +
+                        "Check and validate all inputs",
                         Success = false
                     };
                 }
@@ -215,6 +196,68 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                 };
             }
             catch (Exception e)
+            {
+                return new GenericResponse<ApplicationUser>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = "An error occurred: " + e.Message,
+                    Success = false
+                };
+            }
+
+        }
+
+        public async Task<GenericResponse<IEnumerable<ApplicationUser>>> GetAllUsers()
+        {
+            try
+            {
+                var applicationUsers = await _context.ApplicationUser.Where(a => a.OrganisationId == GetOrg()).ToListAsync();
+                return new GenericResponse<IEnumerable<ApplicationUser>>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Data = applicationUsers,
+                    Message = "Data loaded successfully",
+                    Success = true
+                };
+                
+            }
+            catch(Exception e)
+            {
+                return new GenericResponse<IEnumerable<ApplicationUser>>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = "An error occurred: " + e.Message,
+                    Success = false
+                };
+            }
+        }
+
+        public async Task<GenericResponse<ApplicationUser>> GetUserById(string id)
+        {
+            try
+            {
+                var applicationUser =  await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Id == id);
+                if (applicationUser == null)
+                {
+                    return new GenericResponse<ApplicationUser>
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Data = null,
+                        Message = "No User with this id exist :(",
+                        Success = false
+                    };
+                }
+                return new GenericResponse<ApplicationUser>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Data = applicationUser,
+                    Message = "Data loaded successfully!",
+                    Success = true
+                };
+            }
+            catch(Exception e)
             {
                 return new GenericResponse<ApplicationUser>
                 {

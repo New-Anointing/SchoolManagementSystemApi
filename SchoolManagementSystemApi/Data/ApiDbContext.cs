@@ -14,6 +14,7 @@ namespace SchoolManagementSystemApi.Data
         public DbSet<ApplicationUser> ApplicationUser { get; set; }
         public DbSet<Organisation> Organisation { get; set; }
         public DbSet<ClassRoom> ClassRoom { get; set; }
+        public DbSet<Subjects> Subjects { get; set; }
 
     }
 }

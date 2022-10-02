@@ -44,5 +44,25 @@ namespace SchoolManagementSystemApi.Controllers
 
         }
 
+        [HttpGet("GetAllUsers")]
+        [Authorize(Roles = SD.Admin +","+ SD.SuperAdmin)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<IEnumerable<ApplicationUser>>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type =  typeof(GenericResponse<IEnumerable<ApplicationUser>>))]
+        public async Task<ActionResult> GetAllUsers()
+        {
+            var result = await _iRegServices.GetAllUsers();
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpGet("GetUserById")]
+        [Authorize(Roles = SD.Admin +","+ SD.SuperAdmin)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<ApplicationUser>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type=typeof(GenericResponse<ApplicationUser>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<Exception>))]   
+        public async Task<ActionResult> GetUserById(string id)
+        {
+            var result = await _iRegServices.GetUserById(id);
+            return StatusCode((int)result.StatusCode, result);
+        }
     }
 }
