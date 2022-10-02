@@ -41,3 +41,6 @@ Teacher Model
  Timetable Model
  - Subject
  - Date/Time
+
+username = are@gmail.com
+password = String@1
