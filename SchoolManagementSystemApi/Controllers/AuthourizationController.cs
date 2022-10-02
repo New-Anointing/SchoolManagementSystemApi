@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SchoolManagementSystemApi.DTOModel;
+using SchoolManagementSystemApi.Helpers;
+using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Services.UserAuthorization;
 
 namespace SchoolManagementSystemApi.Controllers
@@ -8,7 +10,7 @@ namespace SchoolManagementSystemApi.Controllers
     [ApiController]
     public class AuthourizationController : ControllerBase
     {
-        private ILoginServices _loginServices;
+        private readonly ILoginServices _loginServices;
         public AuthourizationController
         (
             ILoginServices loginServices
@@ -22,18 +24,13 @@ namespace SchoolManagementSystemApi.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("Login")]
-        public IActionResult Login(UserLoginDto request)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<string>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<string>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(GenericResponse<string>))]
+        public async Task<IActionResult> Login(UserLoginDto request)
         {
-            try
-            {
-               // await _loginServices.Login(request);
-                return Ok(new { Value = _loginServices.Login(request) });
-            }
-            catch (ArgumentException)
-            {
-                return NotFound("User not found or incorrect password");
-            }
-
+            var result = await _loginServices.Login(request);
+            return StatusCode((int)result.StatusCode, result);
 
 
         }

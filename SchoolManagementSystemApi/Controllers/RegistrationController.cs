@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagementSystemApi.DTOModel;
+using SchoolManagementSystemApi.Helpers;
+using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Services.SchoolRegistration;
 using SchoolManagementSystemApi.Utilities;
 
@@ -10,7 +12,7 @@ namespace SchoolManagementSystemApi.Controllers
     [ApiController]
     public class RegistrationController : ControllerBase
     {
-        private IRegServices _iRegServices;
+        private readonly IRegServices _iRegServices;
         public RegistrationController(IRegServices iRegServices)
         {
             _iRegServices = iRegServices;
@@ -21,35 +23,25 @@ namespace SchoolManagementSystemApi.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("SchoolRegistration")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GenericResponse<ApplicationUser>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<ApplicationUser>))]
+        [ProducesResponseType(StatusCodes.Status417ExpectationFailed, Type = typeof(GenericResponse<ApplicationUser>))]
         public async Task<ActionResult> SchoolRegistration(AdminUserDTO request)
         {
-            try
-            {
-                await _iRegServices.SchoolRegistration(request);
-            }
-            catch(ArgumentException)
-            {
-                return Conflict();
-            }
-            return Created("", Ok("User Created Successfully"));
+            var result = await _iRegServices.SchoolRegistration(request);
+            return StatusCode((int)result.StatusCode, result);
+
         }
         [HttpPost("UsersRegistration")]
         [Authorize(Roles = SD.Admin +","+ SD.SuperAdmin)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(GenericResponse<ApplicationUser>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<ApplicationUser>))]
+        [ProducesResponseType(StatusCodes.Status417ExpectationFailed, Type = typeof(GenericResponse<ApplicationUser>))]
         public async Task<ActionResult> UserRegistration(UserDTO request)
         {
-            try
-            {
-                await _iRegServices.UserRegistration(request);
-            }
-            catch(ArgumentException)
-            {
-                return Conflict();
-            }
-            return Created("", Ok("User Created Successfully"));
+            var result = await _iRegServices.UserRegistration(request);
+            return StatusCode((int)result.StatusCode, result);
+
         }
 
     }
