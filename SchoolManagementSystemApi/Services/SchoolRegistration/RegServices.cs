@@ -4,6 +4,7 @@ using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.DTOModel;
 using SchoolManagementSystemApi.Helpers;
 using SchoolManagementSystemApi.Model;
+using SchoolManagementSystemApi.Services.UserResolver;
 using SchoolManagementSystemApi.Utilities;
 using System.Net;
 using System.Security.Claims;
@@ -16,34 +17,25 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUserResolverServices _userResolverService;
         private static ApplicationUser user = new();
         public RegServices
         (
             ApiDbContext context,
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            IUserResolverServices userResolverServices
         )
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _httpContextAccessor = httpContextAccessor;
+            _userResolverService = userResolverServices;
         }
 
-
-        private Guid GetOrg()
-        {
-            string claim = string.Empty;
-            if (_httpContextAccessor.HttpContext != null)
-            {
-                claim = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            }
-
-            var orgId = _context.ApplicationUser.FirstOrDefault(c => c.Id == claim).OrganisationId;
-
-            return orgId;
-        }
+        private Guid OrgId => _userResolverService.GetOrgId();
 
 
 
@@ -150,7 +142,7 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                 user.FirstName = request.FirstName;
                 user.LastName = request.LastName;
                 user.PhoneNumber = request.PhoneNumber;
-                user.OrganisationId = GetOrg();
+                user.OrganisationId = OrgId;
                 user.Gender = request.Gender.ToString();
                 user.DateOfBirth = request.DateOfBirth;
                 user.Role = request.Role.ToString();
@@ -212,7 +204,7 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
         {
             try
             {
-                var applicationUsers = await _context.ApplicationUser.Where(a => a.OrganisationId == GetOrg()).ToListAsync();
+                var applicationUsers = await _context.ApplicationUser.Where(a => a.OrganisationId == OrgId).ToListAsync();
                 return new GenericResponse<IEnumerable<ApplicationUser>>
                 {
                     StatusCode = HttpStatusCode.OK,

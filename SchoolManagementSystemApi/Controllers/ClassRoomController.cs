@@ -12,11 +12,12 @@ namespace SchoolManagementSystemApi.Controllers
     [Authorize(Roles = SD.SuperAdmin + "," + SD.Admin)]
     public class ClassRoomController : ControllerBase
     {
-        public ClassRoomController(IClassRoom iClassRoom)
+        private readonly IClassRoomServices _iClassRoom;
+
+        public ClassRoomController(IClassRoomServices iClassRoom)
         {
             _iClassRoom=iClassRoom;
         }
-        private IClassRoom _iClassRoom;
         /// <summary>
         ///     Register A Class.
         /// </summary>

@@ -5,11 +5,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.Model;
+using SchoolManagementSystemApi.Services.ClassSubjects;
 using SchoolManagementSystemApi.Services.RolesInitializer;
 using SchoolManagementSystemApi.Services.SchoolRegistration;
 using SchoolManagementSystemApi.Services.StudentClass;
 using SchoolManagementSystemApi.Services.UserAuthentication;
 using SchoolManagementSystemApi.Services.UserAuthorization;
+using SchoolManagementSystemApi.Services.UserResolver;
 using Swashbuckle.AspNetCore.Filters;
 
 using System.Text;
@@ -28,11 +30,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApiDbContext>()
     .AddDefaultTokenProviders();
-//Connect intertaces with services
+
+///Connect intertaces with services
+///
 builder.Services.AddScoped<IRegServices, RegServices>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
-builder.Services.AddScoped<IClassRoom, ClassRoomServices>();
+builder.Services.AddScoped<IClassRoomServices, ClassRoomServices>();
 builder.Services.AddScoped<IRolesDbInitializer, RolesDbInitializer>();
+builder.Services.AddScoped<IUserResolverServices, UserResolverService>();
+builder.Services.AddScoped<ISubjectsServices, SubjectsServices>();
 
 //
 builder.Services.AddHttpContextAccessor();

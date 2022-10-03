@@ -3,37 +3,29 @@ using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.DTOModel;
 using SchoolManagementSystemApi.Helpers;
 using SchoolManagementSystemApi.Model;
+using SchoolManagementSystemApi.Services.UserResolver;
 using System.Net;
-using System.Security.Claims;
 
 namespace SchoolManagementSystemApi.Services.StudentClass
 {
-    public class ClassRoomServices : IClassRoom
+    public class ClassRoomServices : IClassRoomServices
     {
         private readonly ApiDbContext _context;
         private static ClassRoom classRoom = new();
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUserResolverServices _userResolverService;
 
-        public ClassRoomServices(
+        public ClassRoomServices
+        (
             ApiDbContext context,
-            IHttpContextAccessor httpContextAccessor
-            )
+            IUserResolverServices userResolverServices
+        )
         {
             _context=context;
-            _httpContextAccessor=httpContextAccessor;
+            _userResolverService = userResolverServices;
         }
-        private Guid GetOrg()
-        {
-            string claim = string.Empty;
-            if (_httpContextAccessor.HttpContext != null)
-            {
-                claim = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            }
 
-            var orgId = _context.ApplicationUser.Where(c => c.Id == claim).FirstOrDefault().OrganisationId;
 
-            return orgId;
-        }
+        private Guid OrgId => _userResolverService.GetOrgId();
 
         public async Task<GenericResponse<ClassRoom>> CreateClass(ClassRoomDTO request)
         {
@@ -41,7 +33,7 @@ namespace SchoolManagementSystemApi.Services.StudentClass
             {
                 classRoom.Class = request.Class;
                 classRoom.ShortCode = request.ShortCode;
-                classRoom.OrganisationId = GetOrg();
+                classRoom.OrganisationId = OrgId;
                 classRoom.Id =  Guid.NewGuid();
                 await _context.ClassRoom.AddAsync(classRoom);
                 await _context.SaveChangesAsync();
@@ -70,7 +62,7 @@ namespace SchoolManagementSystemApi.Services.StudentClass
         {
             try
             {
-                var classRooms = await _context.ClassRoom.Where(c => c.OrganisationId == GetOrg()).ToListAsync();
+                var classRooms = await _context.ClassRoom.Where(c => c.OrganisationId == OrgId && c.IsDeleted == false).ToListAsync();
                 return new GenericResponse<IEnumerable<ClassRoom>>
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -96,7 +88,7 @@ namespace SchoolManagementSystemApi.Services.StudentClass
         {
             try
             {
-                var classRoom = await _context.ClassRoom.FirstOrDefaultAsync(c => c.Id == id);
+                classRoom = await _context.ClassRoom.FirstOrDefaultAsync(c => c.Id == id && c.OrganisationId == OrgId);
                 if(classRoom == null)
                 {
                     return new GenericResponse<ClassRoom>

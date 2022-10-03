@@ -4,7 +4,7 @@ using SchoolManagementSystemApi.Model;
 
 namespace SchoolManagementSystemApi.Services.StudentClass
 {
-    public interface IClassRoom
+    public interface IClassRoomServices
     {
         Task<GenericResponse<ClassRoom>> CreateClass(ClassRoomDTO request);
         //Task<GenericResponse<ClassRoom>> EditClass(Guid id, ClassRoomDTO request);
