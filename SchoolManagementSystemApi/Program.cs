@@ -9,6 +9,7 @@ using SchoolManagementSystemApi.Services.ClassSubjects;
 using SchoolManagementSystemApi.Services.RolesInitializer;
 using SchoolManagementSystemApi.Services.SchoolRegistration;
 using SchoolManagementSystemApi.Services.StudentClass;
+using SchoolManagementSystemApi.Services.TimeTables;
 using SchoolManagementSystemApi.Services.UserAuthentication;
 using SchoolManagementSystemApi.Services.UserAuthorization;
 using SchoolManagementSystemApi.Services.UserResolver;
@@ -31,7 +32,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApiDbContext>()
     .AddDefaultTokenProviders();
 
-///Connect intertaces with services
+///Connect interfaces with services
 ///
 builder.Services.AddScoped<IRegServices, RegServices>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
@@ -39,6 +40,7 @@ builder.Services.AddScoped<IClassRoomServices, ClassRoomServices>();
 builder.Services.AddScoped<IRolesDbInitializer, RolesDbInitializer>();
 builder.Services.AddScoped<IUserResolverServices, UserResolverService>();
 builder.Services.AddScoped<ISubjectsServices, SubjectsServices>();
+builder.Services.AddScoped<ITimeTableServices, TimeTableServices>();
 
 //
 builder.Services.AddHttpContextAccessor();

@@ -11,8 +11,8 @@ namespace SchoolManagementSystemApi.Services.StudentClass
     public class ClassRoomServices : IClassRoomServices
     {
         private readonly ApiDbContext _context;
-        private static ClassRoom classRoom = new();
         private readonly IUserResolverServices _userResolverService;
+        private static ClassRoom classRoom = new();
 
         public ClassRoomServices
         (
@@ -51,7 +51,7 @@ namespace SchoolManagementSystemApi.Services.StudentClass
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     Data = null,
-                    Message = e.Message,
+                    Message = "An error occurred: " + e.Message,
                     Success = false
                 };
             }
