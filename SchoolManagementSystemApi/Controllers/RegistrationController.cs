@@ -58,7 +58,7 @@ namespace SchoolManagementSystemApi.Controllers
         [Authorize(Roles = SD.Admin +","+ SD.SuperAdmin)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<ApplicationUser>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type=typeof(GenericResponse<ApplicationUser>))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<Exception>))]   
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<ApplicationUser>))]   
         public async Task<ActionResult> GetUserById(string id)
         {
             var result = await _iRegServices.GetUserById(id);

@@ -8,5 +8,7 @@ namespace SchoolManagementSystemApi.Model
         public Guid Id { get; set; }
         [Required]
         public string Subject { get; set; }
+        [Required]
+        public string ShortCode { get; set; }
     }
 }

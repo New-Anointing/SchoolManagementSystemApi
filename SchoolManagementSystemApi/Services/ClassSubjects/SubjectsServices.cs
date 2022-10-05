@@ -31,6 +31,7 @@ namespace SchoolManagementSystemApi.Services.ClassSubjects
             {
                 subject.Id = Guid.NewGuid();
                 subject.Subject = request.Subject;
+                subject.ShortCode = request.ShortCode;
                 subject.OrganisationId = OrgId;
                 await _context.Subjects.AddAsync(subject);
                 await _context.SaveChangesAsync();
