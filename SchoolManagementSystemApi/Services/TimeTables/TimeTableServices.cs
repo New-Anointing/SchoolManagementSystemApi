@@ -31,8 +31,8 @@ namespace SchoolManagementSystemApi.Services.TimeTables
             try
             {
                 timeTable.Id = Guid.NewGuid();
-                timeTable.SubjectId = request.SubjectId;
-                timeTable.ClassId = request.ClassId;
+                timeTable.Subjects.Id = request.SubjectId;
+                timeTable.ClassRoom.Id = request.ClassId;
                 timeTable.TimeSchedule = request.TimeSchedule;
                 timeTable.OrganisationId = OrgId;
                 await _context.AddAsync(timeTable);
@@ -88,7 +88,7 @@ namespace SchoolManagementSystemApi.Services.TimeTables
         {
             try
             {
-                var timeTables = await _context.TimeTable.Where(c => c.OrganisationId == OrgId && c.ClassId == classId).ToListAsync();
+                var timeTables = await _context.TimeTable.Where(c => c.OrganisationId == OrgId && c.ClassRoom.Id == classId).ToListAsync();
                 if (!timeTables.Any())
                 {
                     return new GenericResponse<IEnumerable<TimeTable>>
