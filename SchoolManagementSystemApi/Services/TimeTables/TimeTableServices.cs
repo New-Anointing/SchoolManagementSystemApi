@@ -30,9 +30,29 @@ namespace SchoolManagementSystemApi.Services.TimeTables
         {
             try
             {
+                var subject = _context.Subjects.FirstOrDefault(c => c.Id == request.SubjectId && c.OrganisationId == OrgId);
+                if (subject == null)
+                    return new GenericResponse<TimeTable>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Data = null,
+                        Message = "The subject does not exist",
+                        Success = false
+                    };
+
+                var classroom = _context.ClassRoom.FirstOrDefault(c => c.Id == request.ClassId && c.OrganisationId == OrgId);
+                if (classroom == null)
+                    return new GenericResponse<TimeTable>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Data = null,
+                        Message = "The classroom does not exist",
+                        Success = false
+                    };
+
                 timeTable.Id = Guid.NewGuid();
-                timeTable.Subjects.Id = request.SubjectId;
-                timeTable.ClassRoom.Id = request.ClassId;
+                timeTable.Subjects = subject;
+                timeTable.ClassRoom = classroom;
                 timeTable.TimeSchedule = request.TimeSchedule;
                 timeTable.OrganisationId = OrgId;
                 await _context.AddAsync(timeTable);
@@ -55,14 +75,13 @@ namespace SchoolManagementSystemApi.Services.TimeTables
                     Success = false
                 };
             }
-            throw new NotImplementedException();
         }
 
         public async Task<GenericResponse<IEnumerable<TimeTable>>> GetAllTimeTimeTable()
         {
             try
             {
-                var TimeTables = await _context.TimeTable.Where(c => c.OrganisationId == OrgId).ToListAsync();
+                var TimeTables = await _context.TimeTable.Include(x=>x.ClassRoom).Include(x=>x.Subjects).Where(c => c.OrganisationId == OrgId).ToListAsync();
                 return new GenericResponse<IEnumerable<TimeTable>>
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -88,7 +107,7 @@ namespace SchoolManagementSystemApi.Services.TimeTables
         {
             try
             {
-                var timeTables = await _context.TimeTable.Where(c => c.OrganisationId == OrgId && c.ClassRoom.Id == classId).ToListAsync();
+                var timeTables = await _context.TimeTable.Include(x => x.ClassRoom).Include(x => x.Subjects).Where(c => c.OrganisationId == OrgId && c.ClassRoom.Id == classId).ToListAsync();
                 if (!timeTables.Any())
                 {
                     return new GenericResponse<IEnumerable<TimeTable>>

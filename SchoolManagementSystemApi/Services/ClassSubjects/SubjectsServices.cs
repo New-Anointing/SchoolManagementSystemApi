@@ -86,8 +86,8 @@ namespace SchoolManagementSystemApi.Services.ClassSubjects
         {
             try
             {
-                subject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == id && s.OrganisationId == OrgId);
-                if(subject == null)
+                var newSubject = await _context.Subjects.FirstOrDefaultAsync(s => s.Id == id && s.OrganisationId == OrgId);
+                if(newSubject == null)
                 {
                     return new GenericResponse<Subjects>
                     {
@@ -100,7 +100,7 @@ namespace SchoolManagementSystemApi.Services.ClassSubjects
                 return new GenericResponse<Subjects>
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Data = subject,
+                    Data = newSubject,
                     Message = "Data loaded successfully",
                     Success = true
                 };

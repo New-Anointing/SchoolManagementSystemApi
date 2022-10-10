@@ -88,8 +88,8 @@ namespace SchoolManagementSystemApi.Services.StudentClass
         {
             try
             {
-                classRoom = await _context.ClassRoom.FirstOrDefaultAsync(c => c.Id == id && c.OrganisationId == OrgId);
-                if(classRoom == null)
+                var newclassRoom = await _context.ClassRoom.FirstOrDefaultAsync(c => c.Id == id && c.OrganisationId == OrgId);
+                if(newclassRoom == null)
                 {
                     return new GenericResponse<ClassRoom>
                     {
@@ -102,7 +102,7 @@ namespace SchoolManagementSystemApi.Services.StudentClass
                 return new GenericResponse<ClassRoom>
                 {
                     StatusCode = HttpStatusCode.OK,
-                    Data = classRoom,
+                    Data = newclassRoom,
                     Message = "Data loaded successfully",
                     Success = true
                 };
