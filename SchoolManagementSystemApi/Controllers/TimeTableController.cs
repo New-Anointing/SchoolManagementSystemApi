@@ -32,7 +32,7 @@ namespace SchoolManagementSystemApi.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpPost("GetAllTimeTimeTable")]
+        [HttpGet("GetAllTimeTimeTable")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<IEnumerable<TimeTableDTO>>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<IEnumerable<TimeTableDTO>>))]
         public async Task<ActionResult> GetAllTimeTimeTable()
@@ -42,7 +42,7 @@ namespace SchoolManagementSystemApi.Controllers
         }
 
 
-        [HttpPost("CreateTimeTable/{classId}")]
+        [HttpGet("CreateTimeTable/{classId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<IEnumerable<TimeTableDTO>>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<IEnumerable<TimeTableDTO>>))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<IEnumerable<TimeTableDTO>>))]

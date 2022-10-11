@@ -7,6 +7,7 @@ using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Services.ClassSubjects;
 using SchoolManagementSystemApi.Services.RolesInitializer;
+using SchoolManagementSystemApi.Services.SchoolEvents;
 using SchoolManagementSystemApi.Services.SchoolRegistration;
 using SchoolManagementSystemApi.Services.StudentClass;
 using SchoolManagementSystemApi.Services.TimeTables;
@@ -41,6 +42,7 @@ builder.Services.AddScoped<IRolesDbInitializer, RolesDbInitializer>();
 builder.Services.AddScoped<IUserResolverServices, UserResolverService>();
 builder.Services.AddScoped<ISubjectsServices, SubjectsServices>();
 builder.Services.AddScoped<ITimeTableServices, TimeTableServices>();
+builder.Services.AddScoped<IEventsServices, EventsServices>();
 
 //
 builder.Services.AddHttpContextAccessor();
