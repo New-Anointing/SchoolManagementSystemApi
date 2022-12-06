@@ -50,6 +50,26 @@ namespace SchoolManagementSystemApi.Controllers
             var result = await _iEventServices.GetEventById(id);
             return StatusCode((int)result.StatusCode, result);
         }
+
+        [HttpDelete("DeleteEvent/{id}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<EventsDTO>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(GenericResponse<EventsDTO>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<EventsDTO>))]
+        public async Task<ActionResult> DeleteEvent(Guid id)
+        {
+            var result = await _iEventServices.DeleteEvent(id);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpPut("EditEvent/{id}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<EventsDTO>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(GenericResponse<EventsDTO>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<EventsDTO>))]
+        public async Task<ActionResult> EditEvent(Guid id, EventsDTO request)
+        {
+            var result = await _iEventServices.EditEvent(id, request);
+            return StatusCode((int)result.StatusCode, result);
+        }
     }
 }
 

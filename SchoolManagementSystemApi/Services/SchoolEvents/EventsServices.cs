@@ -32,6 +32,7 @@ namespace SchoolManagementSystemApi.Services.SchoolEvents
             {
                 _event.Id  = Guid.NewGuid();
                 _event.Name = request.Name;
+                _event.Description = request.Description;
                 _event.EventDateTime = request.EventDateTime;
                 _event.OrganisationId = OrgId;
                 await _context.Events.AddAsync(_event);
@@ -114,7 +115,89 @@ namespace SchoolManagementSystemApi.Services.SchoolEvents
                     Success = false
                 };
             }
-            throw new NotImplementedException();
+        }
+
+        public async Task<GenericResponse<Events>> DeleteEvent(Guid id)
+        {
+            try
+            {
+                var eventToDelete = await GetEventById(id);
+                if(eventToDelete != null)
+                {
+                    _context.Events.Remove(eventToDelete.Data);
+                    await _context.SaveChangesAsync();
+                    return new GenericResponse<Events>
+                    {
+                        StatusCode = HttpStatusCode.NoContent,
+                        Data = null,
+                        Message = "Event Deleted Successfully",
+                        Success = true
+                    };
+                }
+                return new GenericResponse<Events>
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Data = null,
+                    Message = "No Event with this id exist",
+                    Success = false
+                };
+
+            }
+            catch (Exception e)
+            {
+                return new GenericResponse<Events>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = $"An error occurred: {e.Message}",
+                    Success = false
+                };
+            }
+        }
+
+        public async Task<GenericResponse<Events>> EditEvent(Guid id, EventsDTO request)
+        {
+            try
+            {
+                
+                var eventToEdit = await GetEventById(id);
+                if (eventToEdit == null)
+                {
+                    return new GenericResponse<Events>
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Data = null,
+                        Message = $"Event with Id = {id} not found or might be deleted",
+                        Success = false
+                    };
+
+                }
+                _event.Id  = id;
+                _event.Name = request.Name;
+                _event.EventDateTime = request.EventDateTime;
+                _event.OrganisationId = OrgId;
+                _context.Update(_event);
+                await _context.SaveChangesAsync();
+                return new GenericResponse<Events>
+                {
+                    StatusCode = HttpStatusCode.NoContent,
+                    Data = _event,
+                    Message = "Event updated succesfully",
+                    Success = true
+                };
+
+
+            }
+            catch(Exception e)
+            {
+                return new GenericResponse<Events>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = $"An error occurred: {e.Message}",
+                    Success = false
+                };
+            }
         }
     }
 }
