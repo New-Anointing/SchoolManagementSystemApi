@@ -51,7 +51,7 @@ namespace SchoolManagementSystemApi.Services.SchoolEvents
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     Data = null,
-                    Message = "An error occurred: " + e.Message,
+                    Message = $"An error occurred: { e.Message }" ,
                     Success = false
                 };
             }
@@ -76,7 +76,7 @@ namespace SchoolManagementSystemApi.Services.SchoolEvents
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     Data = null,
-                    Message = "An error occurred: " + e.Message,
+                    Message = $"An error occurred: { e.Message }",
                     Success = false
                 };
             }
@@ -111,7 +111,7 @@ namespace SchoolManagementSystemApi.Services.SchoolEvents
                 {
                     StatusCode = HttpStatusCode.InternalServerError,
                     Data = null,
-                    Message = "An error occurred: " + e.Message,
+                    Message = $"An error occurred: {e.Message}",
                     Success = false
                 };
             }

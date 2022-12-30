@@ -16,8 +16,9 @@ namespace SchoolManagementSystemApi.Data
         public DbSet<ClassRoom> ClassRoom { get; set; }
         public DbSet<Subjects> Subjects { get; set; }
         public DbSet<TimeTable> TimeTable { get; set; }
-        public DbSet<Teachers> Teachers { get; set; }
         public DbSet<Events> Events { get; set; }
+        public DbSet<Teachers> Teachers { get; set; }
+        public DbSet<Students> Students { get; set; }
 
 
     }

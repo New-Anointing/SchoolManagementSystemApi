@@ -51,5 +51,15 @@ namespace SchoolManagementSystemApi.Controllers
             var result = await _timeTableServices.GetTimeTableForClass(classId);
             return StatusCode((int)result.StatusCode, result);
         }
+
+        [HttpDelete("DeleteTimeTable/{Id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(GenericResponse<TimeTableDTO>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<TimeTableDTO>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<TimeTableDTO>))]
+        public async Task<ActionResult> DeleteTimeTable(Guid Id)
+        {
+            var result = await _timeTableServices.DeleteTimeTable(Id);
+            return StatusCode((int)result.StatusCode, result);
+        }
     }
 }

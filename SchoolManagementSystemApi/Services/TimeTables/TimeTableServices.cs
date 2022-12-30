@@ -53,7 +53,8 @@ namespace SchoolManagementSystemApi.Services.TimeTables
                 timeTable.Id = Guid.NewGuid();
                 timeTable.Subjects = subject;
                 timeTable.ClassRoom = classroom;
-                timeTable.TimeSchedule = request.TimeSchedule;
+                timeTable.StartTime = request.StartTime;
+                timeTable.EndTime = request.EndTime;
                 timeTable.OrganisationId = OrgId;
                 await _context.AddAsync(timeTable);
                 await _context.SaveChangesAsync();
@@ -65,7 +66,7 @@ namespace SchoolManagementSystemApi.Services.TimeTables
                     Success = true
                 };
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return new GenericResponse<TimeTable>
                 {
@@ -81,7 +82,7 @@ namespace SchoolManagementSystemApi.Services.TimeTables
         {
             try
             {
-                var TimeTables = await _context.TimeTable.Include(x=>x.ClassRoom).Include(x=>x.Subjects).Where(c => c.OrganisationId == OrgId).ToListAsync();
+                var TimeTables = await _context.TimeTable.Include(x => x.ClassRoom).Include(x => x.Subjects).Where(c => c.OrganisationId == OrgId).ToListAsync();
                 return new GenericResponse<IEnumerable<TimeTable>>
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -126,7 +127,7 @@ namespace SchoolManagementSystemApi.Services.TimeTables
                     Success = true
                 };
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return new GenericResponse<IEnumerable<TimeTable>>
                 {
@@ -136,6 +137,44 @@ namespace SchoolManagementSystemApi.Services.TimeTables
                     Success = false
                 };
             }
+        }
+
+        public async Task<GenericResponse<TimeTable>> DeleteTimeTable(Guid Id)
+        {
+            try
+            {
+                var timeTableToDelete = await _context.TimeTable.FirstOrDefaultAsync(t => t.Id == Id);
+                if (timeTableToDelete != null)
+                {
+                    _context.TimeTable.Remove(timeTableToDelete);
+                    await _context.SaveChangesAsync();
+                    return new GenericResponse<TimeTable>
+                    {
+                        StatusCode = HttpStatusCode.NoContent,
+                        Data = null,
+                        Message = "Timetable deleted successfully",
+                        Success = true
+                    };
+                }
+                return new GenericResponse<TimeTable>
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Data = null,
+                    Message = "No Timetable With This Id Exist",
+                    Success = false
+                };
+            }
+            catch (Exception e)
+            {
+                return new GenericResponse<TimeTable>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = "An error occurred: " + e.Message,
+                    Success = false
+                };
+            }
+            throw new NotImplementedException();
         }
     }
 }

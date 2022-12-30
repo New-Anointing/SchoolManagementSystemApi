@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolManagementSystemApi.Data;
 
@@ -11,9 +12,10 @@ using SchoolManagementSystemApi.Data;
 namespace SchoolManagementSystemApi.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221229214121_created-students-db-model")]
+    partial class createdstudentsdbmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -389,11 +391,16 @@ namespace SchoolManagementSystemApi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("StudentsId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Subject")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StudentsId");
 
                     b.ToTable("Subjects");
                 });
@@ -472,21 +479,6 @@ namespace SchoolManagementSystemApi.Data.Migrations
                     b.HasIndex("SubjectsId");
 
                     b.ToTable("TimeTable");
-                });
-
-            modelBuilder.Entity("StudentsSubjects", b =>
-                {
-                    b.Property<Guid>("StudentsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SubjectsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("StudentsId", "SubjectsId");
-
-                    b.HasIndex("SubjectsId");
-
-                    b.ToTable("StudentsSubjects");
                 });
 
             modelBuilder.Entity("SubjectsTeachers", b =>
@@ -597,6 +589,13 @@ namespace SchoolManagementSystemApi.Data.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("SchoolManagementSystemApi.Model.Subjects", b =>
+                {
+                    b.HasOne("SchoolManagementSystemApi.Model.Students", null)
+                        .WithMany("Subjects")
+                        .HasForeignKey("StudentsId");
+                });
+
             modelBuilder.Entity("SchoolManagementSystemApi.Model.Teachers", b =>
                 {
                     b.HasOne("SchoolManagementSystemApi.Model.ApplicationUser", "ApplicationUser")
@@ -625,21 +624,6 @@ namespace SchoolManagementSystemApi.Data.Migrations
                     b.Navigation("Subjects");
                 });
 
-            modelBuilder.Entity("StudentsSubjects", b =>
-                {
-                    b.HasOne("SchoolManagementSystemApi.Model.Students", null)
-                        .WithMany()
-                        .HasForeignKey("StudentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolManagementSystemApi.Model.Subjects", null)
-                        .WithMany()
-                        .HasForeignKey("SubjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SubjectsTeachers", b =>
                 {
                     b.HasOne("SchoolManagementSystemApi.Model.Subjects", null)
@@ -653,6 +637,11 @@ namespace SchoolManagementSystemApi.Data.Migrations
                         .HasForeignKey("TeachersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SchoolManagementSystemApi.Model.Students", b =>
+                {
+                    b.Navigation("Subjects");
                 });
 #pragma warning restore 612, 618
         }

@@ -4,6 +4,7 @@
     {
         public Guid ClassId { get; set; }
         public Guid SubjectId { get; set; }
-        public DateTime TimeSchedule { get; set; }
+        public DateTime StartTime{ get; set; }
+        public DateTime EndTime { get; set; }
     }
 }

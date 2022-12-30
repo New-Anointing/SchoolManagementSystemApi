@@ -10,6 +10,7 @@ namespace SchoolManagementSystemApi.Services.TimeTables
         Task<GenericResponse<TimeTable>> CreateTimeTable(TimeTableDTO request);
         Task<GenericResponse<IEnumerable<TimeTable>>> GetAllTimeTimeTable();
         Task<GenericResponse<IEnumerable<TimeTable>>> GetTimeTableForClass(Guid classId);
+        Task<GenericResponse<TimeTable>> DeleteTimeTable(Guid Id);
 
     }
 }

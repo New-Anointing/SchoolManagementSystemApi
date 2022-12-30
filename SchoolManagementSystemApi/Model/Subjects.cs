@@ -11,5 +11,6 @@ namespace SchoolManagementSystemApi.Model
         [Required]
         public string ShortCode { get; set; }
         public virtual IEnumerable<Teachers> Teachers { get; set; }
+        public virtual IEnumerable<Students> Students { get; set; }
     }
 }

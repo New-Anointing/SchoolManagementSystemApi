@@ -12,6 +12,8 @@ namespace SchoolManagementSystemApi.Model
         [Required]
         public virtual Subjects Subjects { get; set; }
         [Required]
-        public DateTime TimeSchedule { get; set; }
+        public DateTime StartTime { get; set; }
+        [Required]
+        public DateTime EndTime { get; set; }
     }
 }
