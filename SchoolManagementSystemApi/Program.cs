@@ -10,7 +10,7 @@ using SchoolManagementSystemApi.Services.RolesInitializer;
 using SchoolManagementSystemApi.Services.SchoolEvents;
 using SchoolManagementSystemApi.Services.SchoolRegistration;
 using SchoolManagementSystemApi.Services.StudentClass;
-using SchoolManagementSystemApi.Services.Teachers;
+using SchoolManagementSystemApi.Services.Teacher;
 using SchoolManagementSystemApi.Services.TimeTables;
 using SchoolManagementSystemApi.Services.UserAuthentication;
 using SchoolManagementSystemApi.Services.UserAuthorization;
