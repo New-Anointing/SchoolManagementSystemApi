@@ -107,7 +107,7 @@ namespace SchoolManagementSystemApi.Services.Teacher
         {
             try
             {
-                var regTeachers = await _context.Teachers.Where(t => t.OrganisationId == OrgId && t.IsDeleted == false).ToListAsync();
+                var regTeachers = await _context.Teachers.Include(t => t.ApplicationUser).Where(t => t.OrganisationId == OrgId && t.IsDeleted == false).ToListAsync();
                 if(regTeachers == null)
                 {
                     return new GenericResponse<IEnumerable<Teachers>>
