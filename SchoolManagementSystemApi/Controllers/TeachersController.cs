@@ -54,6 +54,7 @@ namespace SchoolManagementSystemApi.Controllers
         [HttpPut("AssignClassTeachers/{TeacherId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<Teachers>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<Teachers>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(GenericResponse<Teachers>))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<Teachers>))]
         public async Task<ActionResult> AssignClassTeachers(ClassTeacherDTO request, Guid TeacherId)
         {

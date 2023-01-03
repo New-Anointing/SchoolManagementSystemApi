@@ -62,7 +62,7 @@ namespace SchoolManagementSystemApi.Controllers
 
         [HttpPut("EditEvent/{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<EventsDTO>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(GenericResponse<EventsDTO>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<EventsDTO>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<EventsDTO>))]
         public async Task<ActionResult> EditEvent(Guid id, EventsDTO request)
         {

@@ -142,18 +142,28 @@ namespace SchoolManagementSystemApi.Services.Teacher
         {
             try
             {
+                var classRoomExist = await _context.ClassRoom.FirstOrDefaultAsync(s => s.Id == result.ClassRoomId && s.OrganisationId == OrgId && s.IsDeleted == false);
+                if(classRoomExist == null)
+                {
+                    return new GenericResponse<Teachers>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Data = null,
+                        Message = "Invalid Classroom Id Classroom Does Not Exist",
+                        Success = false
+                    };
+                }
                 var teacher = await _context.Teachers.Include(u=>u.ApplicationUser).FirstOrDefaultAsync(t=>t.Id == TeacherId && t.OrganisationId == OrgId && t.IsDeleted == false);
                 if(teacher != null)
                 {
-                    _teacher.ApplicationUser = teacher.ApplicationUser;
-                    _teacher.OrganisationId = OrgId;
-                    _teacher.ClassRoomID = result.ClassRoomId;
-                    _context.Update(_teacher);
+
+                    teacher.ClassRoomID = result.ClassRoomId;
+                    _context.Update(teacher);
                     await _context.SaveChangesAsync();
                     return new GenericResponse<Teachers>
                     {
                         StatusCode = HttpStatusCode.OK,
-                        Data = _teacher,
+                        Data = teacher,
                         Message = "Class Teacher assigned successfully",
                         Success = true
                     };
@@ -178,6 +188,10 @@ namespace SchoolManagementSystemApi.Services.Teacher
                 };
             }
         }
-        
+
+        public Task<GenericResponse<Teachers>> AssignSubjectTeachers(SubjectTeacherDTO result, Guid TeacherId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

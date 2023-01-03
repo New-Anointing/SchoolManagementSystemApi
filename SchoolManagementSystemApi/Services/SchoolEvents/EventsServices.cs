@@ -160,7 +160,7 @@ namespace SchoolManagementSystemApi.Services.SchoolEvents
             try
             {
                 
-                var eventToEdit = await GetEventById(id);
+                var eventToEdit =  GetEventById(id).Result.Data;
                 if (eventToEdit == null)
                 {
                     return new GenericResponse<Events>
@@ -172,16 +172,17 @@ namespace SchoolManagementSystemApi.Services.SchoolEvents
                     };
 
                 }
-                _event.Id  = id;
-                _event.Name = request.Name;
-                _event.EventDateTime = request.EventDateTime;
-                _event.OrganisationId = OrgId;
-                _context.Update(_event);
+                eventToEdit.Name = request.Name;
+                eventToEdit.EventDateTime = request.EventDateTime;
+                eventToEdit.Description = request.Description;
+                eventToEdit.DateUpdated = DateTime.Now;
+                eventToEdit.DateModified = DateTime.Now;
+                _context.Update(eventToEdit);
                 await _context.SaveChangesAsync();
                 return new GenericResponse<Events>
                 {
-                    StatusCode = HttpStatusCode.NoContent,
-                    Data = _event,
+                    StatusCode = HttpStatusCode.OK,
+                    Data = eventToEdit,
                     Message = "Event updated succesfully",
                     Success = true
                 };
