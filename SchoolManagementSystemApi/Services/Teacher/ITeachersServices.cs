@@ -9,6 +9,7 @@ namespace SchoolManagementSystemApi.Services.Teacher
         Task<GenericResponse<IEnumerable<ApplicationUser>>> GetAllTeachers();
         Task<GenericResponse<Teachers>> RegisterTeachers(TeacherUserDTO result);
         Task<GenericResponse<IEnumerable<Teachers>>> GetAllRegisteredTeachers();
+        Task<GenericResponse<Teachers>> GetRegisteredTeacherById(Guid TeacherId);
         Task<GenericResponse<Teachers>> AssignClassTeachers(ClassTeacherDTO result, Guid TeacherId);
         Task<GenericResponse<Teachers>> AssignSubjectTeachers(SubjectTeacherDTO result, Guid TeacherId);
     }

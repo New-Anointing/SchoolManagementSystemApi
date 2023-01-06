@@ -109,7 +109,7 @@ namespace SchoolManagementSystemApi.Services.Student
         {
             try
             {
-                var regStudents = await _context.Students.Include(s=> s.ApplicationUser).Where(t => t.OrganisationId == OrgId && t.IsDeleted == false).ToListAsync();
+                var regStudents = await _context.Students.Include(s=>s.Subjects).Include(s=> s.ApplicationUser).Where(t => t.OrganisationId == OrgId && t.IsDeleted == false).ToListAsync();
                 if (regStudents == null)
                 {
                     return new GenericResponse<IEnumerable<Students>>

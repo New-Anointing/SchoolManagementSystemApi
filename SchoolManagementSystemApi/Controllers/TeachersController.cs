@@ -9,7 +9,7 @@ using SchoolManagementSystemApi.Utilities;
 
 namespace SchoolManagementSystemApi.Controllers
 {
-    [Authorize(Roles = SD.Admin +","+ SD.SuperAdmin)]
+    [Authorize(Roles = $"{SD.Admin} , {SD.SuperAdmin}")]
     [Route("api/[controller]")]
     [ApiController]
     public class TeachersController : ControllerBase
@@ -43,11 +43,21 @@ namespace SchoolManagementSystemApi.Controllers
 
         [HttpGet("GetAllRegisteredTeachers")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<IEnumerable<Teachers>>))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<IEnumerable<Teachers>>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(GenericResponse<IEnumerable<Teachers>>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<IEnumerable<Teachers>>))]
         public async Task<ActionResult> GetAllRegisteredTeachers()
         {
             var result = await _iTeachersServices.GetAllRegisteredTeachers();
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpGet("GetRegisteredTeacherById/{TeacherId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<Teachers>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<Teachers>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<Teachers>))]
+        public async Task<ActionResult> GetRegisteredTeacherById(Guid TeacherId)
+        {
+            var result = await _iTeachersServices.GetRegisteredTeacherById(TeacherId);
             return StatusCode((int)result.StatusCode, result);
         }
 
@@ -59,6 +69,17 @@ namespace SchoolManagementSystemApi.Controllers
         public async Task<ActionResult> AssignClassTeachers(ClassTeacherDTO request, Guid TeacherId)
         {
             var result = await _iTeachersServices.AssignClassTeachers(request, TeacherId);
+            return StatusCode((int)result.StatusCode, result);
+
+        }
+        [HttpPut("AssignSubjectTeachers/{TeacherId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<Teachers>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<Teachers>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(GenericResponse<Teachers>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<Teachers>))]
+        public async Task<ActionResult> AssignSubjectTeachers(SubjectTeacherDTO request, Guid TeacherId)
+        {
+            var result = await _iTeachersServices.AssignSubjectTeachers(request, TeacherId);
             return StatusCode((int)result.StatusCode, result);
 
         }

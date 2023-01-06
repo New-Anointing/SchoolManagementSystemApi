@@ -5,6 +5,7 @@ using SchoolManagementSystemApi.Helpers;
 using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Services.UserResolver;
 using SchoolManagementSystemApi.Utilities;
+using System.Linq;
 using System.Net;
 
 namespace SchoolManagementSystemApi.Services.Teacher
@@ -52,6 +53,7 @@ namespace SchoolManagementSystemApi.Services.Teacher
                 };
             }
         }
+
         public async Task<GenericResponse<Teachers>> RegisterTeachers(TeacherUserDTO result)
         {
             try
@@ -107,12 +109,12 @@ namespace SchoolManagementSystemApi.Services.Teacher
         {
             try
             {
-                var regTeachers = await _context.Teachers.Include(t => t.ApplicationUser).Where(t => t.OrganisationId == OrgId && t.IsDeleted == false).ToListAsync();
+                var regTeachers = await _context.Teachers.Include(t => t.Subjects).Include(t => t.Subjects).Include(t => t.ApplicationUser).Where(t => t.OrganisationId == OrgId && t.IsDeleted == false).ToListAsync();
                 if(regTeachers == null)
                 {
                     return new GenericResponse<IEnumerable<Teachers>>
                     {
-                        StatusCode = HttpStatusCode.NotFound,
+                        StatusCode = HttpStatusCode.NoContent,
                         Data = null,
                         Message = "No Teachers have been registered",
                         Success = false
@@ -138,6 +140,41 @@ namespace SchoolManagementSystemApi.Services.Teacher
             }
         }
 
+        public async Task<GenericResponse<Teachers>> GetRegisteredTeacherById(Guid TeacherId)
+        {
+            try
+            {
+                var regTeacher = await _context.Teachers.Include(t => t.Subjects).Include(t => t.ApplicationUser).FirstOrDefaultAsync(t => t.Id == TeacherId && t.OrganisationId == OrgId && t.IsDeleted == false);
+                if(regTeacher == null)
+                {
+                    return new GenericResponse<Teachers>
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Data = null,
+                        Message = "No registered Teacher with this id exist",
+                        Success = false
+                    };
+                }
+                return new GenericResponse<Teachers>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Data = regTeacher,
+                    Message = "Data Loaded Successfully",
+                    Success = true
+                };
+            }
+            catch(Exception e)
+            {
+                return new GenericResponse<Teachers>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = $"An error occured: {e.Message}",
+                    Success = false
+                };
+            }
+        }
+
         public async Task<GenericResponse<Teachers>> AssignClassTeachers(ClassTeacherDTO result, Guid TeacherId)
         {
             try
@@ -153,7 +190,7 @@ namespace SchoolManagementSystemApi.Services.Teacher
                         Success = false
                     };
                 }
-                var teacher = await _context.Teachers.Include(u=>u.ApplicationUser).FirstOrDefaultAsync(t=>t.Id == TeacherId && t.OrganisationId == OrgId && t.IsDeleted == false);
+                var teacher = await _context.Teachers.Include(t=> t.Subjects).Include(u=>u.ApplicationUser).FirstOrDefaultAsync(t=>t.Id == TeacherId && t.OrganisationId == OrgId && t.IsDeleted == false);
                 if(teacher != null)
                 {
 
@@ -189,9 +226,61 @@ namespace SchoolManagementSystemApi.Services.Teacher
             }
         }
 
-        public Task<GenericResponse<Teachers>> AssignSubjectTeachers(SubjectTeacherDTO result, Guid TeacherId)
+        public async Task<GenericResponse<Teachers>> AssignSubjectTeachers(SubjectTeacherDTO result, Guid TeacherId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                List<Subjects> subjects = new();
+                foreach(var subject in result.Subjects)
+                {
+                    subjects.Add(await _context.Subjects.FirstOrDefaultAsync(s => s.Id == subject));
+                }
+                if (subjects.Contains(null))
+                {
+                    return new GenericResponse<Teachers>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Data = null,
+                        Message = "Invalid request. One or more subject does not exist",
+                        Success = false
+                    };
+                }
+
+                var teacher = await _context.Teachers.Include(t=> t.Subjects).Include(u => u.ApplicationUser).FirstOrDefaultAsync(t => t.Id == TeacherId && t.OrganisationId == OrgId && t.IsDeleted == false);
+                if (teacher != null)
+                {
+                    teacher.Subjects.Clear();
+                    teacher.Subjects = subjects;
+                    await _context.SaveChangesAsync();
+                    return new GenericResponse<Teachers>
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Data = teacher,
+                        Message = "Subject(s) assigned to Teacher successfully",
+                        Success = true
+                    };
+                }
+                return new GenericResponse<Teachers>
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Data = null,
+                    Message = "No Teacher with this id exist",
+                    Success = false
+                };
+
+            }
+            catch(Exception e)
+            {
+                return new GenericResponse<Teachers>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = $"An error occured: {e.Message}",
+                    Success = false
+                };
+            }
+
         }
+
     }
 }
