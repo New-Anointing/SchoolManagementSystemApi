@@ -11,7 +11,7 @@ Teacher Model
   - List of subjects
   
  Parent Model
-  - Student virtual prop
+  - List Student virtual prop
  
  Subject Model
  - list of todos

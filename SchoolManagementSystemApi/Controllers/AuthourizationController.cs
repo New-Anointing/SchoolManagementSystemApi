@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SchoolManagementSystemApi.DTOModel;
 using SchoolManagementSystemApi.Helpers;
-using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Services.UserAuthorization;
 
 namespace SchoolManagementSystemApi.Controllers

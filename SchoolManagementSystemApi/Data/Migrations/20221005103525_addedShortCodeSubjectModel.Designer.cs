@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolManagementSystemApi.Data;
 
@@ -11,9 +12,10 @@ using SchoolManagementSystemApi.Data;
 namespace SchoolManagementSystemApi.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221005103525_addedShortCodeSubjectModel")]
+    partial class addedShortCodeSubjectModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -260,43 +262,6 @@ namespace SchoolManagementSystemApi.Data.Migrations
                     b.ToTable("ClassRoom");
                 });
 
-            modelBuilder.Entity("SchoolManagementSystemApi.Model.Events", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EventDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("OrganisationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Events");
-                });
-
             modelBuilder.Entity("SchoolManagementSystemApi.Model.Organisation", b =>
                 {
                     b.Property<string>("Id")
@@ -328,40 +293,6 @@ namespace SchoolManagementSystemApi.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Organisation");
-                });
-
-            modelBuilder.Entity("SchoolManagementSystemApi.Model.Students", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("ClassRoomID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("OrganisationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("SchoolManagementSystemApi.Model.Subjects", b =>
@@ -398,47 +329,13 @@ namespace SchoolManagementSystemApi.Data.Migrations
                     b.ToTable("Subjects");
                 });
 
-            modelBuilder.Entity("SchoolManagementSystemApi.Model.Teachers", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("ClassRoomID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("OrganisationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("Teachers");
-                });
-
             modelBuilder.Entity("SchoolManagementSystemApi.Model.TimeTable", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ClassRoomId")
+                    b.Property<Guid>("ClassId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("DateCreated")
@@ -450,58 +347,25 @@ namespace SchoolManagementSystemApi.Data.Migrations
                     b.Property<DateTime>("DateUpdated")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<Guid>("OrganisationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("SubjectsId")
+                    b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("TimeSchedule")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClassRoomId");
+                    b.HasIndex("ClassId");
 
-                    b.HasIndex("SubjectsId");
+                    b.HasIndex("SubjectId");
 
                     b.ToTable("TimeTable");
-                });
-
-            modelBuilder.Entity("StudentsSubjects", b =>
-                {
-                    b.Property<Guid>("StudentsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SubjectsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("StudentsId", "SubjectsId");
-
-                    b.HasIndex("SubjectsId");
-
-                    b.ToTable("StudentsSubjects");
-                });
-
-            modelBuilder.Entity("SubjectsTeachers", b =>
-                {
-                    b.Property<Guid>("SubjectsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TeachersId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("SubjectsId", "TeachersId");
-
-                    b.HasIndex("TeachersId");
-
-                    b.ToTable("SubjectsTeachers");
                 });
 
             modelBuilder.Entity("SchoolManagementSystemApi.Model.ApplicationUser", b =>
@@ -588,71 +452,23 @@ namespace SchoolManagementSystemApi.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SchoolManagementSystemApi.Model.Students", b =>
-                {
-                    b.HasOne("SchoolManagementSystemApi.Model.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.Navigation("ApplicationUser");
-                });
-
-            modelBuilder.Entity("SchoolManagementSystemApi.Model.Teachers", b =>
-                {
-                    b.HasOne("SchoolManagementSystemApi.Model.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.Navigation("ApplicationUser");
-                });
-
             modelBuilder.Entity("SchoolManagementSystemApi.Model.TimeTable", b =>
                 {
                     b.HasOne("SchoolManagementSystemApi.Model.ClassRoom", "ClassRoom")
                         .WithMany()
-                        .HasForeignKey("ClassRoomId")
+                        .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SchoolManagementSystemApi.Model.Subjects", "Subjects")
                         .WithMany()
-                        .HasForeignKey("SubjectsId")
+                        .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ClassRoom");
 
                     b.Navigation("Subjects");
-                });
-
-            modelBuilder.Entity("StudentsSubjects", b =>
-                {
-                    b.HasOne("SchoolManagementSystemApi.Model.Students", null)
-                        .WithMany()
-                        .HasForeignKey("StudentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolManagementSystemApi.Model.Subjects", null)
-                        .WithMany()
-                        .HasForeignKey("SubjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SubjectsTeachers", b =>
-                {
-                    b.HasOne("SchoolManagementSystemApi.Model.Subjects", null)
-                        .WithMany()
-                        .HasForeignKey("SubjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolManagementSystemApi.Model.Teachers", null)
-                        .WithMany()
-                        .HasForeignKey("TeachersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
