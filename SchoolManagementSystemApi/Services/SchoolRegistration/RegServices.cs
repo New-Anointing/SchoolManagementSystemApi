@@ -65,7 +65,7 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                 };
 
                 _context.Organisation.Add(Org);
-
+                
 
                 user.Email = request.EmailAddress;
                 user.UserName = request.EmailAddress;
@@ -75,7 +75,7 @@ namespace SchoolManagementSystemApi.Services.SchoolRegistration
                 user.PhoneNumber = request.PhoneNumber;
                 user.Role = SD.SuperAdmin;
                 user.OrganisationId = Guid.Parse(Org.Id);
-                user.Gender = request.Gender;
+                user.Gender = request.Gender.ToString();
                 user.DateOfBirth = request.DateOfBirth;
 
                 var result = await _userManager.CreateAsync(user, request.Password);

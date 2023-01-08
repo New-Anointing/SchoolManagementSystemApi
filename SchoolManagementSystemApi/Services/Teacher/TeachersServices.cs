@@ -233,7 +233,7 @@ namespace SchoolManagementSystemApi.Services.Teacher
                 List<Subjects> subjects = new();
                 foreach(var subject in result.Subjects)
                 {
-                    subjects.Add(await _context.Subjects.FirstOrDefaultAsync(s => s.Id == subject));
+                    subjects.Add(await _context.Subjects.FirstOrDefaultAsync(s => s.Id == subject && s.OrganisationId == OrgId));
                 }
                 if (subjects.Contains(null))
                 {

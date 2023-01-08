@@ -139,5 +139,142 @@ namespace SchoolManagementSystemApi.Services.Student
                 };
             }
         }
+
+        public async Task<GenericResponse<Students>> GetRegisteredStudentsById(Guid StudentId)
+        {
+            try
+            {
+                var regStudent = await _context.Students.Include(s=>s.Subjects).Include(s=>s.ApplicationUser).FirstOrDefaultAsync(s=>s.Id== StudentId && s.OrganisationId == OrgId && s.IsDeleted == false);
+                if(regStudent == null)
+                {
+                    return new GenericResponse<Students>
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Data = null,
+                        Message = "No Student with this id have been registered",
+                        Success = false
+                    };
+                }
+                return new GenericResponse<Students>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    Data = regStudent,
+                    Message = "Data loaded successfully",
+                    Success = true
+                };
+            }
+            catch(Exception e)
+            {
+                return new GenericResponse<Students>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = $"An error occured: {e.Message}",
+                    Success = false
+                };
+            }
+        }
+
+        public async Task<GenericResponse<Students>> AssignClassToStudents(Guid StudentId, StudentsClassDTO result)
+        {
+            try
+            {
+                var classRoomExist = await _context.ClassRoom.FirstOrDefaultAsync(s => s.Id == result.ClassRoomId && s.OrganisationId == OrgId && s.IsDeleted == false);
+                if (classRoomExist == null)
+                {
+                    return new GenericResponse<Students>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Data = null,
+                        Message = "Invalid Classroom Id Classroom Does Not Exist",
+                        Success = false
+                    };
+                }
+                var student = await _context.Students.Include(s => s.Subjects).Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == StudentId && s.OrganisationId == OrgId && s.IsDeleted == false);
+                if (student != null)
+                {
+                    student.ClassRoomID = result.ClassRoomId;
+                    _context.Update(student);
+                    await _context.SaveChangesAsync();
+                    return new GenericResponse<Students>
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Data = student,
+                        Message = "Students' class has been added successfully",
+                        Success = true
+                    };
+                }
+                return new GenericResponse<Students>
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Data = null,
+                    Message = "No Student with this id exist",
+                    Success = false
+                };
+            }
+            catch(Exception e)
+            {
+                return new GenericResponse<Students>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = $"An error occured: {e.Message}",
+                    Success = false
+                };
+            }
+        }
+
+        public async Task<GenericResponse<Students>> AssignSubjectsToStudents(Guid StudentId, StudentsSubjectsDTO result)
+        {
+            try
+            {
+                List<Subjects> subjects = new();
+                foreach(var subject in result.Subjects)
+                {
+                    subjects.Add(await _context.Subjects.FirstOrDefaultAsync(s=> s.Id == subject && s.OrganisationId == OrgId));    
+                }
+                if (subjects.Contains(null))
+                {
+                    return new GenericResponse<Students>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Data = null,
+                        Message = "Invalid request. One or more subject does not exist",
+                        Success = false
+                    };
+                }
+                var student = await _context.Students.Include(s => s.Subjects).Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == StudentId && s.OrganisationId == OrgId && s.IsDeleted == false);
+                if(student != null)
+                {
+                    student.Subjects.Clear();
+                    student.Subjects = subjects;
+                    await _context.SaveChangesAsync();
+                    return new GenericResponse<Students>
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Data = student,
+                        Message = "Student subject(s) have been registered",
+                        Success = true
+                    };
+                }
+                return new GenericResponse<Students>
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Data = null,
+                    Message = "No student with this id exist",
+                    Success = false
+                };
+            }
+            catch(Exception e)
+            {
+                return new GenericResponse<Students>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = $"An error occured: {e.Message}",
+                    Success = false
+                };
+            }
+        }
     }
 }

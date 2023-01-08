@@ -257,7 +257,7 @@ namespace SchoolManagementSystemApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ClassRoom");
+                    b.ToTable("ClassRoom", (string)null);
                 });
 
             modelBuilder.Entity("SchoolManagementSystemApi.Model.Events", b =>
@@ -294,7 +294,7 @@ namespace SchoolManagementSystemApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("SchoolManagementSystemApi.Model.Organisation", b =>
@@ -327,7 +327,7 @@ namespace SchoolManagementSystemApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Organisation");
+                    b.ToTable("Organisation", (string)null);
                 });
 
             modelBuilder.Entity("SchoolManagementSystemApi.Model.Students", b =>
@@ -361,7 +361,7 @@ namespace SchoolManagementSystemApi.Data.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("SchoolManagementSystemApi.Model.Subjects", b =>
@@ -395,7 +395,7 @@ namespace SchoolManagementSystemApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("Subjects", (string)null);
                 });
 
             modelBuilder.Entity("SchoolManagementSystemApi.Model.Teachers", b =>
@@ -429,7 +429,7 @@ namespace SchoolManagementSystemApi.Data.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Teachers");
+                    b.ToTable("Teachers", (string)null);
                 });
 
             modelBuilder.Entity("SchoolManagementSystemApi.Model.TimeTable", b =>
@@ -471,7 +471,7 @@ namespace SchoolManagementSystemApi.Data.Migrations
 
                     b.HasIndex("SubjectsId");
 
-                    b.ToTable("TimeTable");
+                    b.ToTable("TimeTable", (string)null);
                 });
 
             modelBuilder.Entity("StudentsSubjects", b =>
@@ -486,7 +486,7 @@ namespace SchoolManagementSystemApi.Data.Migrations
 
                     b.HasIndex("SubjectsId");
 
-                    b.ToTable("StudentsSubjects");
+                    b.ToTable("StudentsSubjects", (string)null);
                 });
 
             modelBuilder.Entity("SubjectsTeachers", b =>
@@ -501,7 +501,7 @@ namespace SchoolManagementSystemApi.Data.Migrations
 
                     b.HasIndex("TeachersId");
 
-                    b.ToTable("SubjectsTeachers");
+                    b.ToTable("SubjectsTeachers", (string)null);
                 });
 
             modelBuilder.Entity("SchoolManagementSystemApi.Model.ApplicationUser", b =>

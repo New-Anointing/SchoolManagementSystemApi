@@ -51,5 +51,39 @@ namespace SchoolManagementSystemApi.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
+        [HttpGet("GetRegisteredStudentsById/{StudentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<Students>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<Students>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<Students>))]
+        public async Task<ActionResult> GetRegisteredStudentById(Guid StudentId)
+        {
+            var result = await _iStudentsServices.GetRegisteredStudentsById(StudentId);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpPut("AssignClassStudents/{StudentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<Students>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<Students>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(GenericResponse<Students>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<Students>))]
+        public async Task<ActionResult> AssignClassStudents(StudentsClassDTO request, Guid StudentId)
+        {
+            var result = await _iStudentsServices.AssignClassToStudents(StudentId, request);
+            return StatusCode((int)result.StatusCode, result);
+
+        }
+
+        [HttpPut("AssignSubjectStudents/{StudentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<Students>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<Students>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(GenericResponse<Students>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(GenericResponse<Students>))]
+        public async Task<ActionResult> AssignSubjectStudents(StudentsSubjectsDTO request, Guid StudentId)
+        {
+            var result = await _iStudentsServices.AssignSubjectsToStudents(StudentId, request);
+            return StatusCode((int)result.StatusCode, result);
+
+        }
+
     }
 }

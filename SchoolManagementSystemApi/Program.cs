@@ -105,6 +105,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseDeveloperExceptionPage();
+
+SeedDatabase();
+
 app.Run();
 
 void SeedDatabase()
