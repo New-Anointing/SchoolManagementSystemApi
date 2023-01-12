@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using SchoolManagementSystemApi.Data;
 using SchoolManagementSystemApi.Model;
 using SchoolManagementSystemApi.Services.ClassSubjects;
+using SchoolManagementSystemApi.Services.Parent;
 using SchoolManagementSystemApi.Services.RolesInitializer;
 using SchoolManagementSystemApi.Services.SchoolEvents;
 using SchoolManagementSystemApi.Services.SchoolRegistration;
@@ -49,6 +50,7 @@ builder.Services.AddScoped<ITimeTableServices, TimeTableServices>();
 builder.Services.AddScoped<IEventsServices, EventsServices>();
 builder.Services.AddScoped<ITeachersServices, TeachersServices>();
 builder.Services.AddScoped<IStudentsServices, StudentsServices>();
+builder.Services.AddScoped<IParentServices, ParentServices>();
 
 
 //

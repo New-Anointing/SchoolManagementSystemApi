@@ -1,6 +1,6 @@
 ﻿namespace SchoolManagementSystemApi.DTOModel
 {
-    public class StudentsSubjectsDTO : SubjectTeacherDTO
+    public class StudentsSubjectsDTO : SubjectAdderDTO
     {
     }
 }

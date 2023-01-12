@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolManagementSystemApi.Data;
 
@@ -11,9 +12,10 @@ using SchoolManagementSystemApi.Data;
 namespace SchoolManagementSystemApi.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230112183954_creation-of-parent-database-table")]
+    partial class creationofparentdatabasetable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,21 +228,6 @@ namespace SchoolManagementSystemApi.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ParentsStudents", b =>
-                {
-                    b.Property<Guid>("ParentsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("StudentUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ParentsId", "StudentUserId");
-
-                    b.HasIndex("StudentUserId");
-
-                    b.ToTable("ParentsStudents");
-                });
-
             modelBuilder.Entity("SchoolManagementSystemApi.Model.ClassRoom", b =>
                 {
                     b.Property<Guid>("Id")
@@ -369,9 +356,14 @@ namespace SchoolManagementSystemApi.Data.Migrations
                     b.Property<Guid>("OrganisationId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("StudentsId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("StudentsId");
 
                     b.ToTable("Parents");
                 });
@@ -576,9 +568,14 @@ namespace SchoolManagementSystemApi.Data.Migrations
                     b.Property<Guid>("OrganisationId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ParentsId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.HasIndex("ParentsId");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
@@ -634,26 +631,15 @@ namespace SchoolManagementSystemApi.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ParentsStudents", b =>
-                {
-                    b.HasOne("SchoolManagementSystemApi.Model.Parents", null)
-                        .WithMany()
-                        .HasForeignKey("ParentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SchoolManagementSystemApi.Model.Students", null)
-                        .WithMany()
-                        .HasForeignKey("StudentUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SchoolManagementSystemApi.Model.Parents", b =>
                 {
                     b.HasOne("SchoolManagementSystemApi.Model.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("SchoolManagementSystemApi.Model.Students", null)
+                        .WithMany("Parents")
+                        .HasForeignKey("StudentsId");
 
                     b.Navigation("ApplicationUser");
                 });
@@ -723,6 +709,23 @@ namespace SchoolManagementSystemApi.Data.Migrations
                         .HasForeignKey("TeachersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SchoolManagementSystemApi.Model.ApplicationUser", b =>
+                {
+                    b.HasOne("SchoolManagementSystemApi.Model.Parents", null)
+                        .WithMany("StudentUser")
+                        .HasForeignKey("ParentsId");
+                });
+
+            modelBuilder.Entity("SchoolManagementSystemApi.Model.Parents", b =>
+                {
+                    b.Navigation("StudentUser");
+                });
+
+            modelBuilder.Entity("SchoolManagementSystemApi.Model.Students", b =>
+                {
+                    b.Navigation("Parents");
                 });
 #pragma warning restore 612, 618
         }

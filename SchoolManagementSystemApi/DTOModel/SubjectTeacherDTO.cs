@@ -2,9 +2,9 @@
 
 namespace SchoolManagementSystemApi.DTOModel
 {
-    public class SubjectTeacherDTO
+    public class SubjectTeacherDTO : SubjectAdderDTO
     {
-        public List<Guid> Subjects { get; set; } 
+        
     }
 }
 

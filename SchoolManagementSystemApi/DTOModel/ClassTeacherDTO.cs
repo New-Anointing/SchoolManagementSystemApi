@@ -1,7 +1,7 @@
 ﻿namespace SchoolManagementSystemApi.DTOModel
 {
-    public class ClassTeacherDTO
+    public class ClassTeacherDTO : ClassAdderDTO
     {
-        public Guid ClassRoomId { get; set; }
+        
     }
 }

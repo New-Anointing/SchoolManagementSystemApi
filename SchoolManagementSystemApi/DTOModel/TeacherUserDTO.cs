@@ -2,8 +2,8 @@
 
 namespace SchoolManagementSystemApi.DTOModel
 {
-    public class TeacherUserDTO
+    public class TeacherUserDTO : UserAdderDTO
     {
-        public Guid ApplicationUserId { get; set; }
+        
     }
 }
