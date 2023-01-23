@@ -141,7 +141,91 @@ namespace SchoolManagementSystemApi.Services.Parent
 
         public async Task<GenericResponse<Parents>> AddStudentsToParent(ParentStudentDTO result, Guid ParentId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                List<Students> students = new();
+                foreach (var student in result.StudentUser)
+                {
+                    students.Add(await _context.Students.Include(s=>s.ApplicationUser).Include(s=>s.Subjects).FirstOrDefaultAsync(s=>s.Id == student && s.OrganisationId == OrgId));
+                }
+                if (students.Contains(null))
+                {
+                    return new GenericResponse<Parents>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Data = null,
+                        Message = "Invalid request. One or more student does not exist",
+                        Success = false
+                    };
+                }
+                var parent = await _context.Parents.Include(p => p.ApplicationUser).Include(p => p.StudentUser).FirstOrDefaultAsync(p => p.OrganisationId == OrgId && p.IsDeleted == false && p.Id == ParentId);
+                if (parent != null)
+                {
+                    parent.StudentUser.Clear();
+                    parent.StudentUser = students;
+                    await _context.SaveChangesAsync();
+                    return new GenericResponse<Parents>
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Data = parent,
+                        Message = "Parent student(s) have been reistered",
+                        Success = true
+                    };
+                }
+
+                return new GenericResponse<Parents>
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Data = null,
+                    Message = "No Parent with this id exist",
+                    Success = false
+                };
+            }
+            catch(Exception e)
+            {
+                return new GenericResponse<Parents>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = "An error occurred: " + e.Message,
+                    Success = false
+                };
+            }
+        }
+
+        public async Task<GenericResponse<Parents>> GetRegisteredParentById(Guid ParentId)
+        {
+            try
+            {
+                var parents = await _context.Parents.Include(p=>p.ApplicationUser).Include(p=>p.StudentUser).FirstOrDefaultAsync(p=>p.OrganisationId == OrgId && p.IsDeleted == false && p.Id == ParentId);
+                if (parents != null)
+                {
+                    return new GenericResponse<Parents>
+                    {
+                        StatusCode = HttpStatusCode.OK,
+                        Data = parents,
+                        Message = "Data loaded successfully",
+                        Success = true
+                    };
+                }
+                return new GenericResponse<Parents>
+                {
+                    StatusCode =  HttpStatusCode.NotFound,
+                    Data = null,
+                    Message = "No registered parent with this id was found",
+                    Success = false
+                };
+            }
+            catch(Exception e)
+            {
+                return new GenericResponse<Parents>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Data = null,
+                    Message = $"An error occurred {e.Message}",
+                    Success = false
+                };
+            }
         }
     }
 }

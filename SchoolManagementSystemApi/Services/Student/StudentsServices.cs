@@ -144,7 +144,7 @@ namespace SchoolManagementSystemApi.Services.Student
         {
             try
             {
-                var regStudent = await _context.Students.Include(s=>s.Subjects).Include(s=>s.ApplicationUser).FirstOrDefaultAsync(s=>s.Id== StudentId && s.OrganisationId == OrgId && s.IsDeleted == false);
+                var regStudent = await _context.Students.Include(s=>s.Subjects).Include(s=>s.ApplicationUser).Include(s=>s.Parents).FirstOrDefaultAsync(s=>s.Id== StudentId && s.OrganisationId == OrgId && s.IsDeleted == false);
                 if(regStudent == null)
                 {
                     return new GenericResponse<Students>

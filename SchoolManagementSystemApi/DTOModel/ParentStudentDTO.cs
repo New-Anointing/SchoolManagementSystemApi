@@ -4,6 +4,6 @@ namespace SchoolManagementSystemApi.DTOModel
 {
     public class ParentStudentDTO
     {
-        public virtual List<Students> StudentUser { get; set; } = new List<Students>();
+        public virtual List<Guid> StudentUser { get; set; }
     }
 }

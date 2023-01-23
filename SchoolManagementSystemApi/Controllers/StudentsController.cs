@@ -20,7 +20,7 @@ namespace SchoolManagementSystemApi.Controllers
             _iStudentsServices=iStudentsServices;
         }
 
-        [HttpGet("GetUserWithStudentsRoles")]
+        [HttpGet("GetUsersWithStudentsRoles")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<IEnumerable<Students>>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<IEnumerable<Students>>))]
         public async Task<ActionResult> GetAllStudents()
@@ -29,7 +29,7 @@ namespace SchoolManagementSystemApi.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpPost("RegisterUserAsStudents")]
+        [HttpPost("RegisterUsersAsStudents")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericResponse<Students>))]
         [ProducesResponseType(StatusCodes.Status417ExpectationFailed, Type = typeof(GenericResponse<Students>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(GenericResponse<Students>))]

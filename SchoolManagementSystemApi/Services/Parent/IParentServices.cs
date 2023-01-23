@@ -10,5 +10,6 @@ namespace SchoolManagementSystemApi.Services.Parent
         Task<GenericResponse<Parents>> RegisterUserAsParents(ParentUserDTO result);
         Task<GenericResponse<IEnumerable<Parents>>> GetAllRegisteredParents();
         Task<GenericResponse<Parents>> AddStudentsToParent(ParentStudentDTO result, Guid ParentId);
+        Task<GenericResponse<Parents>> GetRegisteredParentById(Guid ParentId);
     }
 }
